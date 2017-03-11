@@ -1,0 +1,106 @@
+Week 1
+Tipps from Coursera Users
+- http://www.rseek.org, http://www.stackoverflow.com
+
+Week 2: Installing the Toolbox
+
+Introduction to git
+-------------------
+http://en.wikipedia.org/GitHub
+http://git-scm.com/book/Getting-Started-About-Version-Control
+http://en.wikipedia.org/wiki/Revision_control
+http://git-scm.com
+http://git-scm.com/downloads
+https://git-scm.com/book/en/Git-Basics-Getting-a-Git-Repository
+
+Configuring git
+---------------
+git (= git bash)
+git config --global user.name "User name"
+git config --global user.email "username@mailer.com"
+git config --list
+exit
+Hint: Use the same username and email address as configure with git
+
+Start a fresh repo from scratch
+-------------------------------
+https://github.com/gmaubach or
+https://github.com/new
+
+Creating a local repository of github
+-------------------------------------
+cd /home/chenyi/Dokuments  # path-to-location-for-local-git-repo
+mkdir cs_ds  # directory-for-local-git-repo-copy
+cd cs_ds  # directory-for-local-git-repo-copy
+git init
+git remote add origin https://github.com/gmaubach/Coursera_Data_Science.git
+
+Fork another users repository
+-----------------------------
+https://help.github.com/articles/fork-a-repo
+
+mkdir path-to-forked-repo
+git clone https://github.com/gmaubach/repo_name_here.git
+
+Git basic commands
+------------------
+git add .  # add all new files
+git add -u  # updates tracking for files which changed names or were deleted
+git add -A  # does both of the previous in one step
+
+git commit -m "message"  # updates local repos, not on github
+
+git push  # update the remote repos on github
+
+git checkout -b branchname  # create a branch of a project
+git branch  # show which branch you are on
+git checkout master  # switch back to master branch
+
+http://git-scm.com/doc
+https://help.github.com
+
+Basic Markdown
+--------------
+# First heading
+## Secondary heading
+### Tertiary heading
+
+# Unordered list
+* first item
+* second item
+* third item
+
+http://daringfireball.net/projects/markdown  # introduction to MD
+http://www.rstudio.com/ide/docs/authoring/using_markdown
+
+Installing R packages
+---------------------
+Repositories: CRAN, Bioconductor Project
+
+-- from CRAN
+available.packages()  # shows all available packages on CRAN
+install.packages("package name")  # install 1 package
+install.packages(c("package name 1", "package name 2", etc.)  # install several packages at once
+
+-- from Bioconductor
+source("http://biconductor.org/biocLite.R")  # download installation package
+biocLite()   # install installation package
+biocLite(c("package name 1", "package name 2", etc.)  # install packages from Bioconductor
+
+http://www.bioconductor.org/install
+
+-- load packages
+library(package name 1)  # load package, don't use quotes cause loading will fail!
+search()  # gives list of attached packages
+
+-- Install RTools for compiling R packages on Windows
+http://cran.r-project.org/bin/windows/Rtools
+The RTools version must match the version of R you are using
+
+http://cran.r-project.org/bin/windows/Rtools/Rtools.txt  # Documentation
+IMPORTANT: Check the box in the installation GUI to tell the installer to edit the PATH variable
+find.package("devtools")  # check to see if the devtools package is already installed
+install.packages("devtools")
+
+library(devtools)  # load
+find_rtools()  # run function to check if RTools is working properly, then TRUE ies returned

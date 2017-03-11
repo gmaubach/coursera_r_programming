@@ -1,0 +1,3469 @@
+---
+title: "Coursera_Data-Science_Programming-with-R_Notes"
+author: "Georg Maubach"
+date: "2016-09-28"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, cache = FALSE)
+```
+# Week 1
+## Lesson 1: R Console Input and Evaluation
+## Lesson 2: Data Types - R Objects and Attributes
+* Data types and operations on these data types
+* Everything in R is an object
+* Atomic classes are
+    + character
+    + numeric (= real numbers)
+    + integer
+    + complex
+    + logical
+* Vectors are the basic objects
+    + vectors can contain objects of the **same** class
+    + Exception: lists are also vectors but can contain objects of **different** classes
+    + Create vectors with the vector() function with argument "Class" and "length"  
+
+### Numbers
+* All numbers are real numbers
+* Exception
+    + When defining number with "L" suffix like x <- 9L which gives 9 instead of 9.0
+    + If you print x - when x is defined x <- 9 - you get the same output as print x - when x is defined x <- 9L
+* Special values
+    + Inf = Infinity
+        + 1 / 0 = Inf
+        + 1 / Inf = 0
+* Example
+```{r}
+1 / 0
+1 / Inf
+```
+    + NaN = undefined value
+        + 0 / 0 = NaN
+        + NaN can be seen as a missing value
+* Example
+```{r}
+0 / 0
+```
+### Attributes
+* Attributes can be part of an object.
+* Not all objects have attributes.
+* Common attributes are:
+    + names, dimnames
+    + dimensions
+    + class
+    + length
+    + other user-defined attributes
+* To access the attributes of an object use attributes(object) function
+* Example
+```{r}
+x <- list(number_one = 1.0)
+x
+attributes(x)
+```
+
+## Lesson 3: Data Types - Vectors and Lists
+### Creating vectors
+* Instead of using vector() vectors can be created with c() (c = concatenate)
+* Examples
+```{r}
+x <- c(0.5, 0.6)  # vector with two entries of type numeric
+x
+
+x <- c(TRUE, FALSE)  # vector with two entries of type logical
+x
+
+x <- c("a", "b", "c")  # vector with two entries of type character
+x
+```
+
+* If you create a vector with vector() it is initialized with "0"
+* Example:
+```{r}
+x <- vector("numeric", length = 10)
+x
+```
+
+### Mixing objects
+#### **Implicit** Coercion
+* When mixing objects of different types R takes the least common denominator vector
+* Example
+```{r}
+y <- c(1.7, "a")  # character
+y
+y <- c(TRUE, 2)  # numeric
+y
+y <- c("a", TRUE)  # character
+```
+* When mixing objects R coerces the data types to the least common denomintar automatically.
+
+#### **Explicit** Coercion
+* Objects can also **explicitly** coerced to another type
+* Example
+```{r}
+x <- 0:6
+class(x)
+x <- as.numeric(x)
+class(x)
+x
+x <- as.logical(x)
+class(x)
+x  # Be aware that all figures >= 1 are coerced to TRUE
+x <- as.character(x)
+class(x)
+x
+```
+
+* If coercion fails the result is NA
+* Example
+```{r}
+x <- c("a", "b", "c")
+x <- as.numeric(x)
+x
+```
+### Creating Lists
+* Lists can contain different types of objects
+* Example
+```{r}
+x <- list(1, "a", TRUE, 1 + 4i)
+x
+```
+* Be aware of the different notation: Elements of lists are shown with values in "[[ value ]]"
+
+## Data Types - Matrices
+* Matrices are a special type of vectors and are special class.
+* Matrices have an attribute "dimension" which define them a vector as matrix.
+
+### Creating a matrix
+* Examples
+```{r}
+m <- matrix(nrow = 2, ncol = 3)  # empty matrix filled initially with NA
+m
+
+m <- matrix(1:6, nrow = 2, ncol = 3)  # filled matrix columnwise
+m
+
+m <- 1:10  # creating a vector
+m
+
+dim(m) <- c(2,5)  # adding an attribute to define rows and columns
+m
+
+x <- 1:3
+y <- 10:12
+
+cbind(x, y)  # columnwise binding of vectors to create a matrix
+rbind(x, y)  # rowwise binding of vectors to create a matrix
+```
+## Data Types - Factors
+* Factors are a special type of vectors representing categorial data.
+* There are two type of factors:
+    + unordered factors
+    + ordered factors
+* Using factors is better than using integers cause factors describe the data better, e. g. 1 = male, 2 = female.
+* Factors can be seen as a simple method for literate programming. Data will be easier to understand.
+* Factors are treated specially by modeling functions, e. g. lm() and glm().
+* Factors have an attribute "levels".
+* Using unclass() function strips out the attribute "factor" of a vector.
+* The sequence of levels can be set by using the "levels" argurment to the factor() function. This is important to define the base line level for modeling functions.
+
+## Data Types - Missing Values
+* There are tow types of missing values:
+    + NaN = Not a Number: indicates undefined mathematical operations
+    + NA = Not availabe : indicates that a value is missing
+* To test if a variable has NaN or NA use either
+    + is.nan()   # or
+    + is.na()
+* NA values have a class, e. g. integer NA, character NA.
+* A NaN values is regarded as "NA but NA is not necessarily a NaN value.
+
+```{r}
+x <- c(1, 2, NA, 4, 5)
+is.na(x)
+
+y <- c(1, 2, NA, NaN, 5)
+is.na(y)   # shows "na" AND "nan" as "na"
+is.nan(y)  # shows ONLY "nan" as "nan"
+```
+
+## Data types - Data Frames
+* A data frame is a key data type to store tabular data.
+* Dataframes are a special type of list where each list has the same length.
+* Each element of the dataframe is a list with the same length.
+* Each column does **NOT** has to be the same type. They can have different classes.
+* Dataframes have special attributes like row.names.
+* Dataframes can be transformed to a matrix using data.matrix but watch out: the columns/lists of a dataframe will be coerced to one data type that fits all data of the dataframe which might not be what you want or would have expected.
+* Dataframes can be created using the data.frame() function.
+```{r}
+x <- data.frame(foo = 1:4, bar = c(TRUE, TRUE, FALSE, FALSE))
+print(x)
+nrow(x)
+ncol(x)
+```
+
+## Data types - Names attribute
+* All R objects can have names. That means that all elements of vector can have names.
+* This is useful for literate programming and self-describing objects.
+```{r}
+x <- 1:3
+names(x)
+names(x) <- c("foo", "bar", "norf")
+print(x)
+names(x)
+```
+
+* Lists can also have names.
+```{r}
+x <- list(a = 1, b = 2, c = 3)
+print(x)
+```
+
+## Reading Tabular Data 
+### Reading functions
+* read.table(), read.csv(): reads tabular data as text
+* readLines(): reads text into a file
+* source(): read and execute R script files (inverse of dump)
+* dget(): read R files (inverse (dput)
+* load(): read binary objects into R
+* unserialize(): read binary objects into R
+
+### Writing functions
+* write.table()
+* writeLines()
+* dump()
+* dput()
+* save()
+* serialize()
+
+### read.table()
+* It is important to understand the arguments.
+```{r}
+?read.table
+```
+
+* The colClasses argument is a vector. It tells R what kind of class the lists of a data frame are.
+* By default strings are read as factors. To avoid this and read the data as is the argument "stringsAsFactors" should be FALSE.
+
+### read.table() Arguments
+* Filename is required.
+* All other arguments are generated automatically.
+* Default value separator is space.
+
+### read.cvs()
+* Default value separator is ",".
+* It is used to import spreadsheet data.
+
+## Reading large tables
+* Make a rough calculation of how much space it needs to read a table.
+* Calculating the amount of consumed memory is important cause R reads all data into RAM.
+* It takes R a lot time to figure out what type the data is. If you use colClasses and hence telling R what data type to use is a lot faster.
+* A good process is to read just a few columns from the data, store the classes in a vector and then read the entire dataset using the newly defined class vector.
+* Example
+```{r}
+# saved_working_dir <- getwd()
+# setwd(dir = "N:/2016/repos_2016/datasciencecoursera")
+# init_tab <- read.table(file = "datatable.txt", nrows = 100)
+# classes <- sapply(init_tab, class)
+# total_tab <- read.table(file = "datatable.txt", colClasses = classes)
+# setwd(saved_working_dir)
+```
+### Get information on large datasets
+* Ask yourself:
+    + How much memory is available?
+    + What other applications are in use and how much memory do they consum?
+    + Are there other users logged into the same system?
+    + What is the operating system?
+    + Is the OS 32 or 64 Bit?
+
+### Calculation of Memory Requirements
+* Example: 1 500 000 row and 12 columns all numeric
+* Calculation:
+    + 1 500 000 x 120 x 8 bytes/numeric
+    + = 1 440 000 000 bytes
+    + 1 440 000 000 / 2^20 bytes
+    + = 1.373.29 MB
+    + = 1.34 GB  # raw storage
+* To read in the data into are there is overhead. The rule of thumb is that you need twice as much memory as the raw data requires.
+
+## Textual Data Formats (dput() and dump())
+* There are formats that allow dumping and deep putting of R data.
+* They convert data to simple text files. There are not tabular data. They have some more meta data.
+
+### Advantages
+* The data and the meta data is stored together in one file.
+* These data files are editable.
+* It useful to store data in a long data.
+* Textual data can be controlled by version control software like git and subversion.
+
+### Disadvantages
+* Textual data is not space efficient.
+* That's why textual data is often compressed.
+
+### dput()
+* dput() writes R code to store R objects in. This code can be used reconstruct the R objects.
+* dput() can be used **only** on a single object.
+* Example
+```{r}
+y <- data.frame(a = 1, b = 2)
+dput(y, file = "y.R")
+new_y <- dget(file = "y.R")
+new_y
+```
+
+### dump()
+* dump() can be used to store multiple objects to a file.
+
+```{r}
+x <- "foo"
+y <- data.frame(a = 1, b = 2)
+dump(c("x", "y"), file = "data.R")
+rm(x, y)
+source("data.R")
+print(x)
+print(y)
+```
+
+## Interfaces - Connections to the outside world
+* Communications with the outside world is done with connections.
+* Connections abstract out the mechanism to connect to different types of objects that are external to R.
+* Types of connections:
+    + file: open a connection to a file
+    + gzfile: open a connection to a compressed gzip file
+    + bzip2: open a connection to a compressed bzip2 file
+    + url: open a connection to a web page
+
+### File connections
+* Arguments of the file connection are:
+    + description: name of the file
+    + open: indicator of how to open the file
+        - "r": read only
+        - "w": writing (and initialising a new file)
+        - "a": appending
+        - "rb", "wb", "ab": reading, writing, appendign binary files on Windows
+        
+* Example
+```{r}
+con <- url("http://www.jhsph.edu", "r")
+x <- readLines(con)
+head(x)
+```
+
+## Subsetting - Basics
+### Subsetting Operators
+* "[ ]" = single brackets
+    + A **single** bracket always **returns an object** of the same class as the original, e. g. subsetting a vector gives a vector, subsetting a list gives a list.
+    + It can be used to select more than one element.
+    + Exception: ?
+* "[[ ]]" = double brackets
+    + A **double** bracket **extracts an element** from a list or data frame.
+    + It extracts always one element.
+    + The object will not necessarily a list or a data frame.
+* "$" = dollar sign
+    + A dollar sign **extracts an element** from a list or data frame.
+    + It is used to extract elements by **only** by name.
+    + The semantics are similar to that of "[[ ]]".
+    + If a dollar sign is used it may or may not be of the same class as the original object.
+    + Question: How do I know in advance of what class the deirved object is?
+
+### Explicit subsetting (with numerical index)
+```{r}
+x <- c("a", "b", "c", "d", "e")
+message("Commands return character vector due to the class of the original object")
+x[1]
+class(x[1])
+x[1:4]
+class(x[1:4])
+```
+
+### Logical subsetting (with logical index)
+```{r}
+x <- c("a", "b", "c", "d", "e")
+message("R has a lexical ordering that makes it possible to use logical operators")
+x[x > "a"]
+```
+
+### Logical subsetting using logical vectors (with logical index)
+```{r}
+# x <- c("a", "b", "c", "d", "e")
+message("Create a logical vector using subsetting")
+logical_vector <- x > "a"
+print(logical_vector)
+message("Use a logical_vector to subset another vector")
+x[logical_vector]
+message("Using logical indexes all elements are elected that are marked with TRUE")
+```
+
+## Subsetting lists
+### Subsetting to extract single elements
+* Lists can be subsetted with either
+    + "[ ]"
+    + "[[ ]]" or
+    + "$"
+    
+```{r}
+x <- list(foo = 1:4, bar = 0.6)
+x[1]
+message("x is list therefore x[1] is also a list")
+class(x[1])
+
+x[[1]]
+message("x is list but x[[1]] returns the elements as a sequence or vector, in this case of class integer")
+class(x[[1]])
+
+x$foo
+message("x$foo extracts the elememts just as [[ ]] do")
+class(x$foo)
+
+x[2]
+message("x[2] returns a list cause x is a list")
+class(x[2])
+
+x["bar"]
+message("x['bar'] returns a list cause x is a list. It does not matter if the object is subsetted using a numeric index or a name as index")
+
+x$bar
+message("x$bar extracts the element of 'bar' and returns it as a value")
+class(x$bar)
+
+x[["bar"]]
+message("x[['bar']] extracts the element just as x$bar does")
+class(x[["bar"]])
+```
+* The advantage of using the name of an element in an object is that you do not need to know the position within the object.
+
+### Subsetting to extract multiple elements
+* Multiple elements can only be extracted using the "[ ]" = single bracket operator.
+* To extract multiple elements you have to use a vector containing the elements you want to extract.
+```{r}
+x <- list(foo = 1:4, bar = 0.6, baz = "hello")
+x[c(1, 3)]
+class(x[c(1, 3)])
+```
+
+### Subsetting with [] or [[ ]] using computed values
+* The "[ ]" or "[[ ]]" operator can be used with computed indices.
+* The "$" operator can only be used with literal names that are part of a list.
+```{r}
+x <- list(foo = 1:4, bar = 0.6, baz = "hello")
+message("Variable containing the name 'foo'")
+name <- "foo"
+message("Using computed index for foo")
+x[[name]]
+message("Be aware that the computed values is given without quotation marks")
+message("There is no element called 'name' in x")
+x$name
+message("The element foo does exist")
+x$foo
+```
+
+### Subsetting elements in nested lists
+* Nested lists are lists which contain other lists. These objest are called nested.
+* Nested lists can be subsetted using double indices or vectors.
+* Example
+```{r}
+x <- list(a = list(10, 12, 14),
+          b = list(3.14, 2,81))
+message("Getting the element '14' of the first list within a list")
+x[[1]][[3]]
+class(x[[1]][[3]])
+message("Getting the element '14' using a vector with index values")
+x[[c(1, 3)]]
+class(x[[c(1, 3)]])
+```
+
+## Subsetting matrices
+* Matrices can be subsetted using first a row and second a column index.
+* Index values for rows or column can be missing which indicates to take all values of the dimension that is missing.
+* Example
+```{r}
+m <- matrix(data = 1:6, nrow = 2, ncol = 3)
+message("Remember: matrices are filled column wise")
+m
+message("Get element '3'")
+m[1, 2]
+message("Be aware that matrices are subsetted using index values without the need to use a vector as was the case when subsetting nested lists")#
+message("The next command gets the whole row number 1 cause the index for the column is missing")
+m[1 , ]
+message("The next command gets the whole column number 2 cause the index for the row is missing")
+m[ , 2]
+message("Be aware that the output of the column 2 is printed on one line and not given in a column although it is column in the matrix object")
+```
+* If you do use the "[ ]" operator you do not get the same object back as the original object.
+```{r}
+m <- matrix(data = 1:6, nrow = 2, ncol = 3)
+message("The following command extracts the value '3' and returns it as a vector rather as an object of class matrix. This is an unexpected behaviour.")
+m[1, 2]
+class(m[1, 2])
+message("To get a matrix with the single element '3' in it you have to use the argument 'drop = FALSE'")
+m[1, 2, drop = FALSE]
+class(m[1, 2, drop = FALSE])
+```
+* The argument "drop = FALSE" prevents R to drop the class and keeps the class of the original object.
+* This is also true if you use subsetting and omit one dimension.
+
+```{r}
+m <- matrix(data = 1:6, nrow = 2, ncol = 3)
+print(m)
+m[ , 2, drop = FALSE]
+class(m[ , 2, drop = FALSE])
+```
+
+## Subsetting - Partial Matching
+* Partial matching can be used with the operators "$" and [[ ]]"
+* The operator "$" looks always for a partial match.
+* The operator "[[ ]]" looks by default for an exact match.
+* But you can turn this behaviour off by specifying the argument "exact = FALSE" when subsetting an object.
+```{r}
+x <- list(asterix = 1:6, bella = 1:5, bello = 1:10)
+x$a  # is totally fine
+x[["a"]]  # does not work cause there is not element named "a"
+x[["a", exact = FALSE]]  # turn of the default behaviour of exact matching and does partial matching
+x$b  # if partial matching fails you get NULL
+```
+
+## Removing missing values (NA)
+### Removing missing values with is.na() function
+```{r}
+x <- c(1, 2, NA, 4, NA, 5, NA, 7)
+bad <- is.na(x)
+# bad is logical vector telling where the elements are missing
+bad
+# To get the values that are good not bad you need to reverse the vector bad using the "!" = NOT operator
+x[!bad]  # or
+good <- !bad
+x[good]
+```
+
+### Removing missing values from multiple vectors with complete.cases() function
+* To get the vectors with no missing values on all vectors combined you can use the complete.cases() function
+* The complete.cases() function return only cases which have no NA' in all columns.
+```{r}
+x <- c( 1,  2,  NA,  4,   NA,  5,  NA, 7)
+y <- c("a", NA, "c", "d", NA, "f", "g", "h")
+good <- complete.cases(x, y)
+print(good)
+x[good]
+y[good]
+```
+### Removing missing values from data frames with complete.cases() function
+* complete.cases() function can also be used to strip out missing values from all variables
+```{r}
+airquality[1:6 , ]
+good <- complete.cases(airquality)
+airquality[good , ][1:6 , ]
+# Be aware that the object airquality is subsetted twice:
+# 1. only the good cases are selected and on this new object a
+# 2. second subsetting index is applied to select only the first
+#    6 rows of the object. Neat.
+```
+
+### Vectorized operations
+* Vectorized operations avoid using loops over cases.
+* Vectorized operations give you the possibiltiy to execute operations in parallel.
+* In parallel means that the elements of two objects are process element wise, i. e. first element of object one and first element of object two.
+```{r}
+x <- 1:4; y <- 6:9
+x + y
+x > 2
+x >= 2
+y == 5
+x * y
+x / y
+```
+* This also applies to matrics
+```{r}
+x <- matrix(1:4, 2, 2); y <- matrix(rep(10, 4), 2, 2)
+x
+y
+x * y    # element wise multiplaction element wise
+x %*% y  # true matrix multiplication
+```
+
+## Swirl for the week
+```{r}
+# install.packages("swirl", repos = "https://cran.uni-muenster.de/")
+library(swirl)
+# swirl()
+```
+
+You should complete the following lessons:
+
+1. Basic Building Blocks
+2. Workspace and Files
+3. Sequences of Numbers
+4. Vectors
+5. Missing Values
+6. Subsetting Vectors
+7. Matrices and Data Frames
+
+### Swirl - 1 R Programming - 4 Vectors
+#### Atomic vectors vs. lists
+- Atomic vectors are vectors that contain only one data type, e.g. numeric = double, character, logical or complex.
+- Numeric vectors are one kind of atomic vectors.
+- Lists are vectors that can contain any data type, i. e. values as a mix of data types, e.g. numeric AND character.
+
+#### Logical Expressions
+- OR (union): A | B
+- AND (intersection): A & B
+- ((111 >= 111) | !(TRUE)) & ((4 + 1) == 5): TRUE
+
+#### Character Vectors
+```{r}
+my_char <- c("My", "name", "is")
+paste(my_char, collapse = " ")
+
+paste("Hello", "world!", sep = " ")
+
+```
+
+### Swirl - 1 R Programming - 5 Missing Values
+- Missing values play an important role in statistics and data analysis. Often, missing values must not be ignored, but rather they should be carefully studied to see if there's an underlying pattern or cause for their missingness.
+- Any operation involving NA generally yields NA as the result. To illustrate, let's create a vector c(44, NA, 5, NA) and assign it to a variable x.
+
+```{r}
+x <- c(44, NA, 5, NA)
+x * 3
+```
+
+
+```{r}
+my_data <- 
+  sample(
+    c(rnorm(1000), 
+      rep(NA, 1000)
+      ),
+    100
+  )
+my_na <- my_data == NA
+```
+- The reason you got a vector of all NAs is that NA is not really a value, but just a placeholder for a quantity that is not available. Therefore the logical expression is incomplete and R has no choice but to return a vector of the same length as my_data that contains all NAs.
+
+```{r}
+my_na <- is.na(my_data)
+```
+
+- Now that we have a vector, my_na, that has a TRUE for every NA and FALSE for every numeric value, we can compute the total number of NAs in our data.
+- The trick is to recognize that underneath the surface, R represents TRUE as the number 1 and FALSE as the number 0. Therefore, if we take the sum of a bunch of TRUEs and FALSEs, we get the total number of TRUEs.
+
+```{r}
+sum(my_na)
+```
+
+- Sample without giving the sample size just returns all values totally mixed up.
+
+```{r}
+# Try
+test <- sample(c(round(rnorm(100), digits = 1), rep(NA, 100), 10000))
+test
+# instead of
+test <- sample(c(round(rnorm(100), digits = 1), rep(NA, 100), 10000), 20)
+test
+```
+
+### Swirl - 1 R Programming - 6 Subsetting vectors
+- The way you tell R that you want to select some particular elements (i.e. a 'subset') from a vector is by placing an 'index vector' in square brackets immediately following the name of the vector.
+- Index vectors come in four different flavors -- logical vectors, vectors of positive integers, vectors of negative integers, and vectors of character strings.
+
+#### Index vectors - logical vectors
+- Recall that `!` gives us the negation of a logical expression, so !is.na(x) can be read as 'is not NA'. Therefore, if we want to create a vector called y that contains all of the non-NA values from x, we can use y <- x[!is.na(x)]. Give it a try.
+
+```{r}
+x <- sample(c(round(rnorm(100), digits = 1), rep(NA, 100), 10000), 20)
+y <- x[!is.na(x)]
+```
+
+```{r}
+x[!is.na(x) & x > 0]
+```
+
+#### Index vectors - Vectors of positive integers
+-  Many programming languages use what's called 'zero-based indexing', which means that the first element of a vector is considered element 0. R uses 'one-based indexing', which (you guessed it!) means the first element of a vector is considered element 1.
+```{r}
+x[0]
+x[3000]
+```
+- R doesn't prevent us from asking for it. This should be a cautionary tale. You should always make sure that what you are asking for is within the bounds of the vector you're working with.
+
+#### Index vectors - Vectors of negative integers
+- What if we're interested in all elements of x EXCEPT the 2nd and 10th? It would be pretty tedious to construct a vector containing all numbers 1 through 40 EXCEPT 2 and 10.
+- Luckily, R accepts negative integer indexes. Whereas x[c(2, 10)] gives us ONLY the 2nd and 10th elements of x, x[c(-2, -10)] gives us all elements of x EXCEPT for the 2nd and 10 elements.
+
+```{r}
+x[c(-2, -10)]
+```
+
+- A shorthand way of specifying multiple negative numbers is to put the negative sign out in front of the vector of positive numbers.
+
+```{r}
+x[-c(2, 10)]
+```
+
+#### Index vectors - Character vectors
+```{r}
+vect <- c(foo = 11, bar = 2, norf = NA)
+vect["bar"]
+vect[c("foo", "bar")]
+```
+
+### Swirl - 1 R Programming - 7 Matrices and Data Frames
+- Matrices and data frames both represent 'rectangular' data types, meaning that they are used to store tabular data, with rows and columns.
+- As with atomic vectors and lists the main difference is that matrices can only contain a single class of data, while data frames can consist of many different classes of data.
+
+#### Matrices
+- A matrix is simply an atomic vector with a dimension attribute.
+
+```{r}
+my_vector <- 1:20
+class(my_vector)
+dim(my_vector)
+length(my_vector)
+dim(my_vector) <- c(4, 5)
+my_matrix <- my_vector
+class(my_matrix)
+dim(my_matrix)
+```
+
+- A more direct method of creating the same matrix uses the matrix() function.
+```{r}
+my_matrix2 <- matrix(1:20, nrow = 4, ncol = 5)
+```
+
+#### Data frames
+- Matrices can store only one class of data.
+
+```{r}
+patients <- c("Bill", "Gina", "Kelly", "Sean")
+my_matrix2 <- cbind(patients, my_matrix)
+my_matrix2
+
+warning(
+  paste("All values in ma_matrix2 are of class 'character' now!\n",
+        "Better use another data type: data frame."
+  )
+)
+```
+
+- That way we do not know which column stores which values cause the columns are not named.
+- Data frames solve this problem by
+    1. let you store values of different classes
+    2. let you name the columns with meaningful names.   
+- See the following example:
+    
+```{r}
+my_data <- data.frame(patients, my_matrix)
+column_names <- c("patient", "age", "weight", "bp", "rating", "test")
+colnames(my_data) <- column_names
+my_data
+```
+
+# Week 2
+
+## Control Structures
+- Control structures control the flow of an R program
+- Basic structures are
+  - if, else: testing a condition
+  - for: loop a fixed number of times
+  - while: loop while a condition is true
+  - repeat: infinite loop
+  - break: stop the execution of a loop
+  - next: skip an iteration of a loop
+  - return: end a function
+
+### if
+if (condition) {  
+  # do something  
+} else {  
+  # do something else  
+}  
+
+* Special: Assignment of an if-statement to a variable *
+```{r}
+x <- 10
+y <- if(x > 3) {
+  10
+} else {
+  0
+}
+```
+
+### For loops
+```{r}
+# for (counter in set-of-values) {
+#  # do something
+# }
+```
+
+#### Looping can be done on elements or indexes
+```{r}
+x <- c("a", "b", "c", "d")
+cat("Loop on elements")
+for (letter in x) {
+   print(letter)
+  # no index is used here
+  # it can loop over any vectors of any kind
+}
+
+cat("Loop on explicitly given index numbers")
+for (i in 1:4) {
+   print(x[i])
+}
+
+cat("Loop on derived index numbers")
+for (i in seq_along(x)) {
+  print(x[i])  
+  # one element after the other using an INDEX of 1 .. 4
+  # INDEX is generated based on the length of vector x
+}
+```
+
+#### Nested loops
+```{r}
+x <- matrix(1:6, 2, 3)
+
+for (i in seq_len(nrow(x))) {
+  for (j in seq_len(ncol(x))) {
+    print(x[i, j])
+  }
+}
+```
+
+**Please note**
+- seq_along = creates a vector of indices from another vector   
+- seq_len = creates a vector from a given maximum value, e. g. seq_len(10) creates a vector of 1..10    
+
+**Please note**
+Nested loops beyond 2-3 levels are difficult to read and understand!
+
+### While loops
+- while loops test a condition at the beginning.
+- while lopps iterate as long as the condition is true.
+- If the condition is never met the while loop is infinite and runs forever.
+
+**Please note**
+Design and use while loops with care!
+
+```{r}
+count <- 0
+while (count < 10) {
+  print(count)
+  count <- count + 1
+}
+```
+
+### Loops with Repeat and Break
+- Repeat loops initiates an infinte loop.
+- Repeat loops run forever unless they are interrupted by a break command.
+
+```{r}
+x0 <- 1
+tolerance <- 1e-8
+
+computeEstimate <- function() {
+  # some calucations not given here
+  # just for illustration purposes
+  return(1)
+}
+
+repeat {
+  x1 <- computeEstimate()
+  
+  if (abs(x1 - x0) < tolerance) {
+    break
+  } else {
+    x0 <- x1
+  }
+}
+print(x0)
+```
+
+**Please note**
+- These formulation can be used in many types of optimization algorithms, e. g.
+   + find a solution on some type of equations
+   + maximize a function
+- Iterate over an over again until the estimates gets closer together to converge the minimum or maximum of the function.
+
+**Please note**
+- It is hard to predict how long the loop will run.
+- It is better to use a for loop to have a hard limit.
+
+### Next
+- next is used to skip an iteration
+```{r}
+for (i in 1:30) {
+  if (i <= 20) {
+    # skip the first 20 iterations
+    next
+  }
+  # do something during the rest of the loop with values raning from 21..100
+  print(i)
+}
+```
+
+**Please note**
+Other types of looping type functions are more usefull, e. g. the apply functions apply, mapply, lapply.
+
+## Functions
+- Functions should be written in a text file rathen than in the console.  
+  
+- A function is defined using the reserved word function which is assigned to a function name.
+- Functions can take arguments enclosed in braces.
+
+### Lecture: Basic function definitions
+```{r}
+add2 <- function(x, y) {
+  x + y
+  # the value of the last expression is used as the return value of the function
+}
+```
+
+```{r}
+above10 <- function(x) {
+  # Computes a vector of values greater than 10
+  # Arguments
+  #   x: vector of values
+  # Return
+  #   Return a vector of values greater than 10.
+  #   If there are no values greater than 10
+  #   the function will return an empty vector.
+  # Rational
+  #   Create a subset of elements for further computations.
+  
+  # Create a logial vector indicating where 
+  # the values greater than 10 are
+  use <- x > 10
+  
+  # Subset the original vector with the logical 
+  # vector to get a vector with all elements greater
+  # than 10 of the original vector.
+  x[use]
+}
+```
+
+```{r}
+above <- function(x , n) {
+  # Same as above but now with a second argument
+  # telling the function to take an arbritrary number
+  # for comparison.
+  # This way the function above10 is more generally defined.
+  # The user can define what the threshold shall be.
+  
+  use <- x > n
+  
+  x[use]
+}
+
+x <- 1:20
+above(x, 12)
+
+```
+
+### Lecture: Default values for arguments
+- Default values can indicate commonly used values or recommended values for a funcion.
+- Default values make the work with functions easier cause they eliminate the need to specify the values for all arguments.
+```{r}
+above <- function(x , n = 10) {
+  # Same as above but now with a default value
+  # for the second argument.
+  
+  use <- x > n
+  
+  x[use]
+}
+x <- 1:20
+above(x)  # now runs without giving the value for the second argument
+```
+
+### Lecture: Functions with statistical calculations
+```{r}
+column_means <- function(dataset) {
+  # Calculates the mean for each column of the dataset
+  number_of_cols <- ncol(dataset)
+  
+  # Create an empty numeric vector with number_of_cols elements.
+  # Elements are initialized with "0", not NA.
+  means <- numeric(number_of_cols)
+  for (column in 1:number_of_cols) {
+    means[column] <- mean(dataset[, column])
+  }
+  means
+}
+# Using the airquality dataset to test the function.
+column_means(airquality)
+
+#--------------
+column_means <- function(dataset, remove_na = TRUE) {
+  # Calculates the mean for each column of the dataset
+  number_of_cols <- ncol(dataset)
+  
+  # Create an empty numeric vector with number_of_cols elements.
+  # Elements are initialized with "0", not NA.
+  means <- numeric(number_of_cols)
+  for (column in 1:number_of_cols) {
+    means[column] <- mean(dataset[, column], na.rm = remove_na)
+  }
+  means
+}
+# Using the airquality dataset to test the function.
+column_means(airquality)
+```
+
+### Lecture: Functions - Part 1
+- Functions are first class R objects.
+- Functions are of class 'function'.
+- Functions can be treated as any other R object:
+      - Functions can be passed as arguments to other functions
+      - Functions can be nested. This means that functions can be defined within other functions.
+- Functions are defined with
+function_name <- function(argument1 = default_value,
+                          argument2 = default_value,  ...) {
+                          # commands of the function
+                          # return(value)
+                          }
+
+- Named arguments may have default values.
+- Default values help using the function cause the suggest meaningful values.
+- Functions can have positional or named arguments. Positional arguments have to be mentioned first.
+- Positional and named arguments can be mixed when writing or calling a function.
+- Named arguments can be mentioned in any order when calling the functions.
+- Argument names are matched partially as long as the match is unique.
+- The order of named argument matching is
+      - exact match
+      - partial match
+      - positional match.
+
+**Please note**
+It is not recommended to mess around with the order of arguments cause it can lead to confusion. Although named arguments can be mentioned in any order it is recommended to mention the arguments in the order the function definition does.
+
+### Lecture: Functions - Part 2
+
+#### Lazy Evaluation
+- Arguments are evaluated only if they are needed.
+```{r}
+f <- function(a, b) {
+  a^2}
+f(2)
+```
+- The arguemnt of "2" is only positionally matched.
+- Lazy evaluation causes a function to operate until an argument has to be evaluated that causes. Up to that point all other commands within the function are executed properly.
+
+#### Special Argument "..."
+- The "..." argument indicates a variable number of arguemnts.
+- The "..." argument is used if you do not want to copy a complete argument list that has to be passed to other functions.
+- It can be used to extend an existing function with additional arguments.
+- In addition it is used in object oriented programming when it comes to defining methods for objects.
+
+```{r}
+myplot <- function(x, y, type = "l", ...) {
+  plot(x, y, type = type, ...)
+}
+```
+
+- The "..." argument is **necessary** when the number of arguments passed to a function can not known in advance.
+```{r}
+args(paste)
+args(cat)
+```
+- The function "paste" and "cat" do not know how many arguments the shall put together.
+
+**Please note**
+- Any arguments after the "..." argument have to be named arguments.
+- All arguments after the "..." argument can not be partially matched when calling the function.
+- The arguments after "..." have to be named explicitly and in full.
+
+### Lecture: Scoping Rules 1
+
+#### Symbol binding
+- Each object is bound to a symbol, e. g. a value, a function, etc.
+- When R tries to find a value for a symbol it searches in a series of environments which are an ordered list of objects:
+
+1. .GlobalEnv (is always 1st on the search list)
+2. Search List  
+
+- The .GlobalEnv is the users workspace. Usually all variables and functions are defined here.
+- The search list can be printed usingd "search()".
+- If there are 2 objects with the same name R takes the object with comes first in the global environment or the search list.  
+- The search list consists of all packages that are currently loaded into R.
+- If an object is searched the order of the packages within the search list matters.
+- Packages can be loaded at any time. That way you can not assume a package to be loaded or that the packages appear in any expected order.
+- If a new packages get loaded it is inserted always a the 2nd position of the search path right behind the .GlobalEnv which is always the 1st element.
+
+**Please note**
+- R has separate namespaces for functions and non-functions.
+- The vector named c does not interfere with the function named c().
+
+#### Scoping Rules
+- Function arguments are bound variables.
+- Free variables are variables that were defined outside the function and before the function was defined but used inside a function. Free variables are not formal arguments and are not logical variables assigned inside the function body.
+
+```{r}
+z <- 5
+f <- function(x, y) {
+  x^2 + y / z
+}
+```
+
+**Please note**
+The value of free variables are searched for in the environment in which the function was first defined.
+
+- Objects are searched down the search list until the empty environment is reached.
+
+**Please note**
+An object is defined in a package the top level environment is the namespace of that package.
+
+### Lecture: Scoping Rules 2
+- R uses lexical scoping instead of dynamic scoping.
+- Objects are searched in the environment in which they are 1st defined.
+
+#### Example 1
+```{r}
+y <- 10
+
+g <- function(x) {
+  x * y
+}
+
+f <- function(x) {
+  y <- 2
+  y ^ 2 + g(x)
+}
+
+message("What is the value of f()?")
+f(3)  # y = 2 ^2 + 3 * 10
+
+message("What is the value of g()?")
+g(3)
+```
+
+#### Example 2
+```{r}
+rm(list = c("y", "f", "g"))
+
+y <- 10
+
+f <- function(x) {
+  
+  g <- function(x) {
+  x * y
+  }
+  
+  y <- 2
+  y ^ 2 + g(x)
+}
+
+message("What is the value of g()?")
+# g(3)  # g() is not defined
+
+
+message("What is the value of f()?")
+f(3)
+```
+
+#### Consequences of lexical scoping
+- All variables have to be stored in memory.
+- All functions must take a pointer to their defining environemnts, which could be anywhere.
+
+### Lecture: Optimizations
+**Please note**
+- Almost all optimization functions are maximasation functions in R.
+- If you want to minimize a function you have to use the negative value, e. g. -(a + b)
+
+- Function can be "built" that contain all the necessary data for evaluating the function.
+- There is no need to carry long argument lists, which is useful for interactive and repetitive work.
+- Code can be simplified and cleaned up.
+
+- Reference: Gentleman, Ihaka: Lexical Scoping and Statistical Computing, Journal of Computational and Graphical Statistics (JCGS) 9, 2000, p. 491 - 508
+
+### Lecture: Coding Standards
+- Use a text editor to write just text without any formatting.
+- Indent your code. A recommendation is 4 spaces.
+- Limit the width of your code in number of colums. Use
+maximum of 80 characters. A recommendation is 60 or 70 characters.
+- Limit the length of your functions. A recommendation is to
+limit the function to one basic activity. Split the functions 
+in logical steps. A recommendation is that the function should be able to be printed on one page of the screen in the text editor.
+
+### Lecture: Dates and Time
+- Dates and times are represented in special classes:
+1. Dates: class "Date"
+2. Times: class "POSIXct" and "POSIXlt"
+- The reference date in R is 1970-01-01:
+1. Dates are stored as days elapsed from the reference date.
+2. Times are stored as seconds elapsed from the reference date.
+
+#### Dates
+- Dates are coerced from a string using as.Date(), as.POSIXct or
+as.POSIXlt.
+```{r}
+x <- as.Date("1970-01-01")
+x
+class(x)
+```
+
+- Unclassing a date returns the number of days or seconds after
+ the reference date.
+```{r}
+unclass(x)
+unclass(as.Date("2016-11-14"))
+```
+#### Times
+##### POSIXct
+- Times are representated as big integers.
+
+##### POSIXlt
+- Times are representated as lists.
+- Here you have different useful functions:
+1. weekdays
+2. months
+3. quarters
+
+#### Working with dates and times
+- Unclassing an POSIXlt object returns a list of all elements
+contained in the POSIXlt object.
+```{r}
+current_time <- as.POSIXlt(Sys.time())
+names(current_time)  # does not work
+unclass(current_time)  # shows element of POSIXlt object
+current_time$hour  # access of one element of the POSIXlt object
+```
+#### Converting dates and times from different formats
+- the strptime() function can be used to get R dates and time
+objects from different dates and times using format strings.
+
+```{r}
+datestring <- c("Januar 10, 2012 10:40")
+datestring
+mydate <- strptime(datestring, "%B %d, %Y %H:%M")
+mydate
+class(mydate)
+```
+
+**Please note**
+Date and time strings are dependent on the current locale used when the program is run.
+
+#### Date and time comparisons
+- Dates and times can be used in mathematical operations, e.g.
+"+", "+", "==", "<", ">", "<=", ">=".
+
+**Please note**
+Comparisons are only possible on objects of the same type.
+
+```{r}
+x <- as.POSIXct("2016-11-12")
+y <- as.POSIXct("2016-11-14")
+z <- x - y
+z
+
+x <- as.Date("2016-11-12")
+y <- as.POSIXct("2016-11-14")
+z <- x - y
+
+x <- as.Date("2016-11-12")
+y <- as.POSIXct("2016-11-14")
+x <- as.POSIXct(x)
+z <- x - y
+z
+```
+
+- Operations on dates and times keep track of leap years,
+ leap years and time zones.
+- Plotting functions recognize date and times objects.
+
+** Please note **
+Mote on control statements can be found in the swirl flow control lesson.
+
+## Swirl for the week
+### swirl - 1 R Programming - 8 Logic
+#### Logical Operators
+1. equality operator (==)
+2. inequality operators (<, >, <=, >=)
+3. not equals operator (!=)
+4. NOT operator (!)
+
+#### Relationship operators for multiple logical expressions
+1. "&" (AND operator (vectorized))
+2. "|" (OR operator (vectorized))
+3. "&&" (AND operator (not vectorized, takes only the first element))
+4. "||" (OR operator (not vectorized, takes only the first element))
+
+#### Order of logical expressions
+1. AND operator (&, &&)
+2. OR operator (|, ||)
+
+#### Logical comparison works also for vectors
+```{r}
+ints <- sample(10)  # creates a vector of 10 elements from 1 .. 10
+ints
+ints > 5  # returns a vector of logicals for each element of the vector
+```
+
+#### Functions for logical expressions
+1. isTRUE(): returns TRUE if the argument is true
+2. identical(): returns TRUE if the passed arguments are identical
+3. which()
+4. any()
+5. all()
+
+##### which()
+- which() takes a logical vector as an argument and returns the indices of the vector that are TRUE, e. g. which(c(TRUE, FALSE, TRUE)) would return the vector c(1, 3).
+
+##### any()
+- any() takes a logical vector as an argurment and returns TRUE if **any** of the arguments is TRUE.
+
+##### all()
+- all() takes a logical vector as an argurment and returns TRUE if **all** of the arguments is TRUE.
+
+##### xor()
+- xor() returns TRUE only if one of the arguments is TRUE
+- If both of the arguments are TRUE or one of the arguments are FALSE, xor() returns FALSE.
+
+###### xor() logical matrix
+1. TRUE  | TRUE  = FALSE (whereas "|" with TRUE | TRUE = TRUE instead of FALSE)
+2. TRUE  | FALSE = TRUE
+3. FALSE | TRUE  = TRUE
+4. FALSE | FALSE = FALSE
+
+### swirl - 1 R Programming - 9 Functions
+#### Function Basics
+- Functions are fundamental building blocks of R programs.
+- Functions can be used like any other R object.
+- Functions can be recognized by an identifier followed by parenthesis ("( )").
+- Input values to a function are called "arguments". The appear as values between the parenthesis of a function.
+- Function argurments are the "variables" that the function operates on.
+- The last value in a function becomes it return value.
+- Despite putting the last value as return value you can use return() or invisible() to return a value at any time.
+- Function are defined by assigning them to an identifier:
+
+function_name <- function(arg1, arg2)
+{
+ # Manipulate arguments in some way
+ # Return a value
+}
+
+
+- The identifier becomes the name of the function.
+- The function is called by its name and providing the values for the arguments:
+
+function_name(arg1 = value1, arg2 = value2)
+
+
+- The source code of a function is printed by calling its name without parenthesis or arguments.
+
+
+- If the values of arguments do not change most of the time, it is helpful to define a default value for those arguments.
+- Default values are given as values to the argument:
+
+my_function <- function(arg1, arg2 = value1) 
+{
+# here is your code
+}
+
+
+- Calling a function can be done with argument values by order and by name.
+- If values are given by order the order is important for value matching.
+- If values are given by name the order is unimportant.
+
+
+- To examine the arguments of a function by calling args().
+
+#### Function as argument values
+You can pass functions as arguments to other functions just like you can pass
+data to functions. Let's say you define the following functions:
+
+add_two_numbers <- function(num1, num2){
+  num1 + num2
+}
+
+multiply_two_numbers <- function(num1, num2){
+num1 * num2
+}
+some_function <- function(func){
+  func(2, 4)
+}
+
+As you can see we use the argument name "func" like a function inside of 
+"some_function()." By passing functions as arguments 
+some_function(add_two_numbers) will evaluate to 6, while
+some_function(multiply_two_numbers) will evaluate to 8.
+
+As you can see we use the argument name "func" like a function inside of
+"some_function()." By passing functions as arguments
+some_function(add_two_numbers) will evaluate to 6, while
+some_function(multiply_two_numbers) will evaluate to 8.
+
+Finish the function definition below so that if a function is passed into the
+"func" argument and some data (like a vector) is passed into the dat argument
+the evaluate() function will return the result of dat being passed as an
+argument to func.
+
+Hints: This exercise is a little tricky so I'll provide a few example of how
+evaluate() should act:
+
+  1. evaluate(sum, c(2, 4, 6)) should evaluate to 12
+  2. evaluate(median, c(7, 40, 9)) should evaluate to 9
+  3. evaluate(floor, 11.1) should evaluate to 11
+
+##### Example
+```{r}
+evaluate <- function(func, dat){
+  func(dat)
+}
+
+evaluate(sd, c(1.4, 3.6, 7.9, 8.8))
+``` 
+
+#### Anonymous functions
+##### Example
+```{r}
+evaluate(function(x){x+1}, 6)
+```
+
+- This function gets a tiny anomymous function.
+- The second value is the data value passed to the function.
+
+##### Example
+Try using evaluate() along with an anonymous function to return the first element of the vector c(8, 4, 0). Your anonymous function should only take one argument which should be a variable `x`.
+
+```{r}
+evaluate(function(x) {x[1]}, c(8, 4, 0))
+```
+
+##### Example
+Now try using evaluate() along with an anonymous function to return the last element of the vector c(8, 4, 0). Your anonymous function should only take one argument which should be a variable `x`.
+
+```{r}
+evaluate(function(x) {x[length(x)]}, c(8, 4, 0))
+```
+
+#### Indefinite number of arguments in functions
+- The "..." (ellipse or dot-dot-dot) operator allows to pass an indefinite number of arguments to a function.
+**Please note:** All arguments after an ellipses must have default values.
+
+The ellipses can be used to pass on arguments to other functions that are
+used within the function you're writing. Usually a function that has the
+ellipses as an argument has the ellipses as the last argument. The usage of
+such a function would look like:
+
+ellipses_func(arg1, arg2 = TRUE, ...)
+
+In the above example arg1 has no default value, so a value must be provided
+for arg1. arg2 has a default value, and other arguments can come after arg2
+depending on how they're defined in the ellipses_func() documentation.
+Interestingly the usage for the paste function is as follows:
+
+paste (..., sep = " ", collapse = NULL)
+
+Notice that the ellipses is the first argument, and all other arguments after
+the ellipses have default values. This is a strict rule in R programming: all
+arguments after an ellipses must have default values. Take a look at the
+simon_says function below:
+
+simon_says <- function(...){
+  paste("Simon says:", ...)
+}
+
+The simon_says function works just like the paste function, except the
+begining of every string is prepended by the string "Simon says:"
+
+Telegrams used to be peppered with the words START and STOP in order to
+demarcate the beginning and end of sentences. Write a function below called 
+telegram that formats sentences for telegrams.
+For example the expression `telegram("Good", "morning")` should evaluate to:
+"START Good morning STOP".
+
+##### Example
+```{r}
+telegram <- function(...){
+  paste("START", ..., "STOP")
+}
+telegram("Good", "morning", "Vietnam!")
+```
+
+#### Access arguments form an ellipse (dot-dot-dot)
+Let's explore how to "unpack" arguments from an ellipses when you use the
+ellipses as an argument in a function. Below I have an example function that
+is supposed to add two explicitly named arguments called alpha and beta.
+
+add_alpha_and_beta <- function(...){
+  # First we must capture the ellipsis inside of a list
+  # and then assign the list to a variable. Let's name this
+  # variable `args`.
+
+  args <- list(...)
+
+  # We're now going to assume that there are two named arguments within args
+  # with the names `alpha` and `beta.` We can extract named arguments from
+  # the args list by using the name of the argument and double brackets. The
+  # `args` variable is just a regular list after all!
+  
+  alpha <- args[["alpha"]]
+  beta  <- args[["beta"]]
+
+  # Then we return the sum of alpha and beta.
+
+  alpha + beta 
+}
+
+Have you ever played Mad Libs before? The function below will construct a
+sentence from parts of speech that you provide as arguments. We'll write most
+of the function, but you'll need to unpack the appropriate arguments from the
+ellipses.
+
+##### Example
+```{r}
+mad_libs <- function(...){
+  # Do your argument unpacking here!
+  args <- list(...)
+  
+  place <- args[["place"]]
+  adjective <- args[["adjective"]]
+  noun <- args[["noun"]]
+  
+  # Don't modify any code below this comment.
+  # Notice the variables you'll need to create in order for the code below to
+  # be functional!
+  paste("News from", place, "today where", adjective, "students took to the streets in protest of the new", noun, "being installed on campus.")
+}
+```
+
+#### Custom made operators
+The syntax for creating new binary operators in R is unlike anything else in
+R, but it allows you to define a new syntax for your function. I would only
+recommend making your own binary operator if you plan on using it often!
+
+User-defined binary operators have the following syntax:
+     %[whatever]% 
+where [whatever] represents any valid variable name.
+
+Let's say I wanted to define a binary operator that multiplied two numbers and
+then added one to the product. An implementation of that operator is below:
+
+"%mult_add_one%" <- function(left, right){ # Notice the quotation marks!
+  left * right + 1
+}
+
+I could then use this binary operator like `4 %mult_add_one% 5` which would
+evaluate to 21.
+
+Write your own binary operator below from absolute scratch! Your binary
+operator must be called %p% so that the expression:
+
+      "Good" %p% "job!"
+
+will evaluate to: "Good job!"
+
+##### Example
+```{r}
+"%p%" <- function(arg1, arg2){
+  paste(arg1, arg2)
+}
+"Good" %p% "job!"
+```
+
+### swirl - 1 R Programming - 14 Dates and Times
+#### Dates
+- R has a special way of representing dates and times, which can be helpful if  you're working with data that show how something changes over time (i.e.
+time-series data) or if your data contain some other temporal information, like dates of birth.
+- Dates are represented by the 'Date' class and times are represented by the  'POSIXct' and 'POSIXlt' classes. Internally, dates are stored as the number of days since 1970-01-01 and times are stored as either the number of seconds since 1970-01-01 (for 'POSIXct') or a list of seconds, minutes, hours, etc. (for 'POSIXlt').
+- Let's start by using d1 <- Sys.Date() to get the current date and store it in the variable d1. (That's the letter 'd' and the number 1.)
+
+```{r}
+d1 <- Sys.Date()
+class(d1)
+# What does d1 look like internatlly?
+unclass(d1)
+print(d1)
+```
+
+- What if you need a data prior to 1970-01-01?
+```{r}
+d2 <- as.Date("1969-01-01")
+unclass(d2)
+```
+- As you may have anticipated, you get a negative number. In this case, it's -365, since 1969-01-01 is exactly one calendar year (i.e. 365 days) BEFORE 1970-01-01.
+
+#### Times
+- Now, let's take a look at how R stores times. You can access the current date and time using the Sys.time() function with no arguments. Do this and store the result in a variable called t1.
+
+```{r}
+t1 <- Sys.time()
+print(t1)
+class(t1)
+```
+
+- As mentioned earlier, POSIXct is just one of two ways that R represents time information. (You can ignore the second value above, POSIXt, which just functions as a common language between POSIXct and POSIXlt.) Use unclass() to see what t1 looks like internally -- the (large) number of seconds since the beginning of 1970.
+
+```{r}
+unclass(t1)
+```
+
+- By default, Sys.time() returns an object of class POSIXct, but we can coerce the result to POSIXlt with as.POSIXlt(Sys.time()). Give it a try and store the result in t2.
+
+```{r}
+t2 <- as.POSIXlt(Sys.time())
+class(t2)
+print(t2)
+unclass(t2)
+```
+
+- t2, like all POSIXlt objects, is just a list of values that make up the date and time. Use str(unclass(t2)) to have a more compact view.
+
+
+```{r}
+str(unclass(t2))
+```
+
+- If, for example, we want just the minutes from the time stored in t2, we can access them with t2$min. Give it a try.
+
+```{r}
+t2$min
+```
+
+#### Date and time functions (weekdays(), months(), quarters())
+##### weekdays()
+- The weekdays() function will return the day of week from any date or time object. Try it out on d1, which is the Date object that contains today's date.
+
+```{r}
+weekdays(d1)
+```
+
+##### months()
+- The months() function also works on any date or time object. Try it on t1, which is the POSIXct object that contains the current time (well, it was the current time when you created it).
+
+```{r}
+months(t1)
+```
+
+##### quarters()
+- The quarters() function returns the quarter of the year (Q1-Q4) from any date or time object. Try it on t2, which is the POSIXlt object that contains the time at which you created it.
+
+```{r}
+quarters(t2)
+```
+
+#### Date and time conversion
+- Often, the dates and times in a dataset will be in a format that R does not recognize. The strptime() function can be helpful in this situation.
+- strptime() converts character vectors to POSIXlt. In that sense, it is similar to as.POSIXlt(), except that the input doesn't have to be in a particular format (YYYY-MM-DD).
+- To see how it works, store the following character string in a variable called t3: "October 17, 1986 08:24" (with the quotes).
+
+```{r}
+t3 <- "October 17, 1986 08:24"
+```
+- Now, use strptime(t3, "%B %d, %Y %H:%M") to help R convert our date/time object to a format that it understands. Assign the result to a new variable called t4. (You should pull up the documentation for strptime() if you'd like to know more about how it works.)
+```{r}
+t4 <- strptime(t3, "%B %d, %Y %H:%M")  # works only in English locale
+class(t4)
+unclass(t4)
+```
+
+#### Date and time operations
+- Finally, there are a number of operations that you can perform on dates and times, including arithmetic operations (+ and -) and comparisons (<, ==, etc.)
+-  The variable t1 contains the time at which you created it (recall you used Sys.time()). Confirm that some time has passed since you created t1 by using the 'greater than' operator to compare it to the current time: Sys.time() > t1.
+
+```{r}
+Sys.time() > t1
+```
+
+- So we know that some time has passed, but how much? Try subtracting t1 from the current time using Sys.time() - t1. Don't forget the parentheses at the end of Sys.time(), since it is a function.
+
+```{r}
+Sys.time() - t1
+```
+
+- The same line of thinking applies to addition and the other comparison operators. If you want more control over the units when finding the above difference in times, you can use difftime(), which allows you to specify a 'units' parameter.
+
+```{r}
+difftime(Sys.time(), t1, units = 'days')
+```
+
+- In this lesson, you learned how to work with dates and times in R. While it is important to understand the basics, if you find yourself working with dates and times often, you may want to check out the lubridate package by Hadley Wickham.
+
+
+# Week 3
+## Lecture 1: Loop Functions and Debugging
+- R provides functions that implement looping and simplify the usage of for- or while loops.
+- These looping functions are:
+
+1. lapply: Loop over a list and evaluate a function on each element. Loop over a list of objects and apply a function to every element of that list.
+2. sapply: Sames as lapply but try to simplify the output.
+3. apply: Apply a function over the margins of an array.
+4. tapply: Apply a function over subsets of a vector.
+5. mapply: Multivariate version of lapply.
+
+- The auxiliary function split() is usefull in conjunction with lapply. split() splits objects into sub pieces.
+
+## Lecture 2: Loop Functions - lapply/sapply
+- lapply takes three arguments and always returns a list.
+- The names for the elements in the generated output list are the same as in the input, i. e. the names of the original list are preserved.
+
+1. a list as "x" (coerced to a list if not a list)
+2. a function or a function name as FUN
+3. other arguments taken with the "..." argument. This arguments is used to hand-over arguments to the function called with the argument FUN.
+
+### Example
+```{r}
+x <- list(a = 1:5, b = rnorm(10))
+lapply(x, mean)
+```
+### Example
+- runif creates random values according to the uniform distribution. The first argument specifies how many uniform values shall be computed.
+```{r}
+x <- 1:4
+lapply(x, runif)
+```
+### Given the function in lapply additional arguments
+- To hand-over argument values different from the standard values, name the arguments for the function in lapply in the "..." argument and assign values to them.
+
+### Example
+```{r}
+x <- 1:4
+lapply(x, runif, min = 0, max = 10)
+```
+### Anonymous Functions
+- Anonymous functions = functions without names.
+- They are created on the fly.
+- The function exists only in the context of lapply.
+- If lapply is finished the anonymous functions does not exist anymore.
+- As long as the function needed does not exist, is has to be created within the lapply function as an anonymous function.
+
+#### Example
+```{r}
+x <- list(a = matrix(1:4, 2, 2), b = matrix(1:6, 3, 2))
+x
+# Return the first column of each element
+lapply(x, function(element) { element[ , 1] })
+```
+### sapply
+- sapply is a variant of lapply.
+- sapply tries to simplify the output.
+- lapply always returns a list. sapply applies the following rules to the resulting object:
+
+1. If the result is a list where element if length 1, then a vector is returned.
+2. If the result is a list where every element is a vector of the same length (> 1), then a matrix is returned.
+3. If sapply can not find out what kind of object it is, a list is returned.
+
+#### Example
+```{r}
+x <- list(a = 1:4, b = rnorm(10), c = rnorm(10, 1), d = rnorm(100,5))
+# lapply just returns a list with elements of length 1.
+lapply(x, mean)
+# It might be convenient to have a vector returned out of that operation.
+sapply(x, mean)
+# mean() can not applied to x cause x is a list and the mean() is not defined for list but for numeric vectors.
+mean(x)
+# results in an error.
+```
+
+## Lecture 3: Loop functions - apply
+### apply
+- apply evaluates a function over the margins of an array, e. g. the rows or columns.
+- apply is similar to a for-loop in terms of performance but it is less typing on the command line.
+- apply takes 4 arguments:
+
+1. X as an array. An array is an object with dimensions attached to it.
+2. MARGIN as integer vector indicating which margins should be "retained".
+3. FUN as the function to apply to the data.
+4. "..." argument takes other arguments passed to the functin FUN.
+
+- apply reduced the dimensions of an array:
+1. If MARGIN = 1 (rows) the row dimension is preserved and the columns are collapsed.
+2. If MARGIN = 2 (columns) the column dimension is preserved and the row are collapsed.
+
+#### Example
+````{r}
+x <- matrix(rnorm(200), 20, 10)
+x
+apply(x, 2, mean)  # 2 = columns are preserved
+apply(x, 1, sum)   # 1 = rows are preserved
+```
+### col/row sums and means
+- For the functions sum and mean there are specilized functions optimized for spead on large objects:
+  
+1. rowSums  = apply(x, 1, sum)
+2. rowMeans = apply(x, 1, mean)
+3. colSums  = apply(x, 2, sum)
+4. colMeans = apply(x, 2, means)
+
+### Other ways to Apply
+#### Example
+- The apply function is applied to the rows of matrix and return two values for each row:
+1. 25 % quantile
+2. 75 % quantile
+```{r}
+x <- matrix(rnorm(200), 20, 10)
+apply(x, 1, quantile, probs = c(0.25, 0.75))
+```
+
+#### Example
+- Collapse the 3rd dimension of a 3-dimensional array.
+```{r}
+a <- array(rnorm(2 * 2 * 10), c(2, 2, 10))
+a
+apply(a, c(1, 2), mean)
+```
+#### Example
+- The rowMeans function can be applied to an array giving it the argument of the dimension.
+```{r}
+a <- array(rnorm(2 * 2 * 10), c(2, 2, 10))
+a
+rowMeans(a, dims = 1)
+```
+** Question: ** Welche Dimensionen werden denn dann fuer die Berechnung genutzt?
+
+## Lecture 4: mapply / Vectorizing of a Function
+- mapply applies a function in parallel over a set of arguments.
+- mapply can be applied to multiple sets of arguments.
+- mapply takes 5 arguments:
+1. The function to be applied to the objects as FUN. The number of arguments of that function has to be at least as long as the number of lists passed to mapply.
+2. "..." argument is used to pass the lists to the function. Objects provided here must not be a list but need to be able to be coerced to a list.
+3. MoreArgs tells mapply that you have more lists than arguments in the function to mapply.
+4. SIMPLIFY argument is the same as in sapply/tapply.
+
+### Example
+```{r}
+list(rep(1, 4), rep(2, 3), rep(3, 2), rep(4, 1))
+mapply(rep, 1:4, 4:1)
+```
+### Vectorizing a function
+- Vectorizing a function can be done using mapply.
+- It vectorizes a function that does not allow for vector arguments.
+```{r}
+# Not vectorized
+noise <- function(n, mean, sd) {
+  rnorm(n, mean, sd)
+}
+
+noise(5, 1, 2)
+
+# This call 
+# rnorm(1:5, 1:5, 2)
+# delivers an output of
+# rnorm(1, 1, 2)
+# rnorm(2, 1, 2)
+# rnorm(3, 1, 2)
+# rnorm(4, 1, 2)
+# rnorm(5, 1, 2)
+# i. e. 5 random normal values with mean = 1, sd = 2.
+noise(1:5, 1:5, 2)
+
+# To get a output in the form
+# 1 random normal values with mean 1, sd = 2
+# 2 random normal values with mean 2, sd = 2
+# 3 random normal values with mean 3, sd = 2
+# 4 random normal values with mean 4, sd = 2
+# 5 random normal values with mean 5, sd = 2
+mapply(noise, 1:5, 1:5, 2)
+
+# The above mapply call is the same as
+list(noise(1, 1, 2), noise(2, 2, 2),
+     noise(3, 3, 2), noise(4, 4, 2),
+     noise(5, 5, 2))
+```
+## Lecture 5: tapply
+- tapply applies a function to a subset of a vector.
+- tapply delivers a list back.
+- tapply splits up a vector into pieces and applies a summary statistic or function to these pieces.
+- After it applies the function it brings the pieces back together again.
+- tapply takes 5 arguments:
+1. X as a vector of some sort, e. g. numeric vector.
+2. INDEX is a factor or a list of factors of the same length as X,indicating in which group each element of X is in, e. g. men, women.
+3. FUN is the function to be applied to the data.
+4. "..." takes the arguments that go into the function named by FUN.
+5. Simplify is a logical value indicating if the result shall be simplified as it is done in the sapply function.
+
+
+### Example
+```{r}
+x <- c(rnorm(10), runif(10), rnorm(10, 1))
+x
+f <- gl(3, 10)
+f
+# Simplify and return a vector.
+tapply(x, f, mean)
+
+# Do not simplify, just return a list.
+tapply(x, f, mean, simplify = FALSE)  
+```
+
+### Example
+```{r}
+# Same data a before
+x <- c(rnorm(10), runif(10), rnorm(10, 1))
+x
+f <- gl(3, 10)
+f
+
+# tapply returns 2 values instead of 1
+tapply(x, f, range)
+```
+
+## Lecture 6: Loop Functions - split
+- Split it not a loop function but can be used in conjunction with the apply family of functions.
+- Split cuts a list of elements into pieces but applies not function to the pieces.
+- If you have split groups apart with the split function the apply family of functions can be applied to the resulting groups.
+- Split always returns a list.
+
+### Example
+```{r}
+# Same data a before
+x <- c(rnorm(10), runif(10), rnorm(10, 1))
+x
+f <- gl(3, 10)
+f
+split(x, f)
+```
+
+###  Example
+```{r}
+# Same data a before
+x <- c(rnorm(10), runif(10), rnorm(10, 1))
+x
+f <- gl(3, 10)
+f
+
+# Calling the lapply function with a list created by split
+lapply(split(x, f), mean)
+
+# is the same as calling the tapply function as before
+tapply(x, f, mean)
+```
+
+- Using tapply is more compact than using split and lapply, but split and lapply can be applied to much more complicated data.
+
+#### Example
+- To calculate the mean of a set of variable for each month.
+
+```{r}
+library(datasets)
+head(airquality)
+s <- split(airquality, airquality[["Month"]])
+
+# Returns a list for each month.
+lapply(s, function(x) {colMeans(x[ , c("Ozone", "Solar.R", "Wind")])}) 
+
+# Returns a matrix with months as columns and variables as rows.
+# Much more compact format and better readable.
+sapply(s, function(x) { colMeans(x[ , c("Ozone", "Solar.R", "Wind")])})  
+
+# na.rm eliminates missing values.
+sapply(s, function(x) { colMeans(x[ , c("Ozone", "Solar.R", "Wind")], na.rm = TRUE)}) 
+```
+
+### Splitting on More than One Level
+- If there is a need to split on more than one level, then a variable with all levels needed has to be created.
+- Passing the split function a list of variable causes split to create the combination of factors in the given variables for the programmer.
+
+#### Example
+```{r}
+x <- rnorm(10)
+f1 <- gl(2, 5)
+f2 <- gl(5, 2)
+f1
+f2
+f3 <- interaction(f1, f2)
+f3
+
+# Using a new factor variable with a combination of factors from 2 variables that shall be used for a split.
+str(split(x, f3))
+
+# split creates the combination of factors in the given variables automatically and returns a list of the interactive factor levels.
+# There might be zero levels resulting from the operation.
+str(split(x, list(f1, f2)))
+```
+- split has an argument "drop" it will drop empty levels when splitting.
+```{r}
+str(split(x, list(f1, f2)))
+```
+
+## Lecture 7: Debugging Basics
+- There are 4 indications that something is wrong.
+- These indications appear in sequence with increasingly severe (from 1 just information to 3 fatal):
+
+1. message: a generic notification message, printed during execution of a function, execution continues
+2. warning: an indication that something is wrong but not fatal, printed after execution of a function, execution continues, a value is given back
+3. error: an indication that something is fatal, printed during execution of function, execution stops
+4. condition: a generic concept for indicating that something unexpected can occur created by programmers
+
+### Example
+```{r}
+log(-1)
+```
+
+- invisible(): returns an object, but the return value is not printed to the console
+
+### Example
+```{r}
+print_message <- function(x)
+{
+  if(x > 0)
+  {
+    print("x is greater than zero")
+  } else
+  {
+    print("x is less than zero")
+  }
+}
+
+print_message(1)
+# print_message(NA)
+```
+
+### Example
+```{r}
+print_message2 <- function (x)
+{
+  if (is.na(x))
+  {
+    print("x is a missing value!")
+  } else if (x > 0)
+  {
+    print("x is greater than zero")
+  } else
+  {
+    print("x is less than zero")
+  }
+}
+
+x <- log(-1)
+print_message2(x)
+
+# There is no error. But there is something unexpected.
+```
+
+### Debugging Process
+- If you see that something is wrong with your function ask yourself the following questions in given sequence:
+
+1. How did you call the function? What was your ** actual ** input?
+2. What were you expecting? Output, messages, other results?
+3. What did you get?
+4. How does what you get differ from what you were expecting?
+5. Were your expectations correct in the first place?
+6. Can you reproduce the problem (exactly)?
+
+ad 1:
+Look at the input to the function you actual gave it, not what you thought you gave it.
+
+ad 2:
+- To day "It did not work." is not enough.
+- How do you know that it didn't work? I was expecting this and I got that. Then you know it did not work.
+- What you have expected is important to articulate.
+
+ad 5:
+- You have to exactly reproduce the problem. If it happens only one time you will never have the chance to examine the problem.
+- If you want to get help you have to show someone how you created the problem. The process by which you encountered the error is very important to find the reason for the error and later a solution to fix it.
+
+#### Example
+If a problem occurs with a special number or sequence of numbers, you will never find the reason for the problem if you use random numbers. To find a solution you need to use set.seed() to get the same random numbers each try.
+
+If the problem is happening right on your computer it is most of the time easy to find a reason for an error. If you are interating with a web site or doing computations in parallel on different machines if could be hard to find a reason cause the machines you are interacting with my change, e. g. the web site or the status of the machine itself.
+
+## Lecture 8: Debugging Tools Introduction
+There are 5 functions to help you find errors:
+
+1. **traceback**: Tells you the call stack of all functions and were the error occured. You can find out where in a sequence of function calls the error occured. Execution is stopped and the console comes back to you.
+2. **debug**: You can give debug a function as argument and it flags the function for debugging mode. Debugging mode means that whenever the function is called, execution is stopped, the browser is called and you can step through the function line by line. The debug function stops always right a the beginning of the function and calls the browser.
+3. **browser**: browser is a function that can be put anywhere in your code thus execution is not stopped at the beginning of a function like with debug but at certain point defined by the programmer. If the browser function is called you can walk through your function line by line.
+4. **trace**: trace allows you insert debugging code into a function at specific places without changing the function code at all. This is very handy for debugging some else's code.
+5. **recover**: allows you move around in the traceback call stack.
+
+**Please note:** Using print/cat statements within the code is inefficient cause once the function operates correctly you need to delete or comment out the print/cat statements for debugging.
+
+## Lecture 9: Debugging Tools Applied
+### traceback
+- traceback will give you the most recent error. If you execute any additonal code then you will not get any traceback cause in the additional code there is not error.
+- The traceback can be used to communicate with other about the error.
+#### Example
+```{r}
+
+# rm(x)
+# mean(x)
+# traceback()
+```
+#### Example
+```{r}
+# uncomment these line for presentation
+# rm(list = c(x, y))
+# lm(y ~ x)
+# traceback()
+```
+
+### debug
+- The debug function prints out at first the whole function body. That's also a reason for having the code of functions to be relatively small cause otherwise your console gets polluted with output.
+- After calling the function which shall be debugged the browser is called.
+- The browser is like the R workspace. But the environment of that workspace is not the global workspace but the workspace of your function environment. The objects, i. e. the arguments to your function, are in your browser's environment.
+- **Please note**: Default values to the function call are not printed when debugging.
+- If you are in the browser you can hit "n" for "next" to execute the next line in your function.
+- You can call the debugging again from within the browser to nest debugging features an additional functions.
+
+#### Example
+```{r}
+# uncomment these line for presentation
+# debug(lm)
+# lm(y ~ x)
+# browser
+```
+
+### recover
+- The error handler using the recover function can be set using the options function.
+- This option is global for the current R session.
+- If an error occurs you get a little menu with the call stack which is the same as you would get calling traceback.
+- Using the menu item numbers you can step into each command of your function and see what's getting on there. If you are ready you can step back to the menu of recover and step into the next command. This way you can pin-point where the problem occurs.
+
+#### Example
+```{r}
+options(error = recover)
+# uncomment these line for presentation
+# read.csv("nosuchfile")
+```
+
+### Summary
+- Only "error" is fatal and stops execution.
+- Always try to reproduce the problem to clearly state the difference between output and your expecations.
+- The interactive debugging tools "traceback", "debug", "browser", "trace" and "recover" help to find the reason for problems and errors in functions.
+- Debugging tools are no substitute for thinking.
+
+## Swirl for the week
+### swirl - 1 R Programming - 10 lapply and sapply
+- apply functions are function that loop over data. They can substitute a for loop.
+- apply functions offer a concise and convenient way to implement the Split-Apply-Combine strategy in data analysis.
+- Each of the *apply functions will SPLIT up some data into smaller pieces, APPLY a function to each piece, then COMBINE the results. A more detailed discussion of this strategy is found in Hadley Wickham's Journal of Statistical Software paper titled 'The Split-Apply-Combine Strategy for Data Analysis'.
+- Dataset used in this lession  "http://mlr.cs.umass.edu/ml/machine-learning-databases/flags/".
+
+```{r}
+url <- "http://mlr.cs.umass.edu/ml/machine-learning-databases/flags/flag.data"
+
+temp <- tempfile()
+
+download.file(url, temp)
+
+flags <- read.csv(
+  file = temp,
+  header = FALSE,
+  sep = ","
+)
+
+names(flags) <- 
+  c("name", "landmass", "zone", "area", "population", "language",
+    "religion", "bars", "stripes", "colours", "red", "green", "blue",
+    "gold", "white", "black", "orange", "mainhue", "circles",
+    "crosses", "saltires", "quarters", "sunstars", "crescent",
+    "triangle", "icon", "animate", "text", "topleft", "botright")
+```
+
+- viewinfo() ???
+- lapply applies a function to the elements of a list. Data frames are also lists.
+- "Type cls_list <- lapply(flags, class) to apply the class() function to each column of the flags dataset and store the result in a variable called cls_list."
+- The "l" in lapply stands for list to remind you that the output of lapply is a list.
+
+```{r}
+cls_list <- lapply(flags, class)
+print(cls_list)
+```
+
+- The output would be
+| considerably more compact if we could represent it as a vector instead of a list.
+You may remember from a previous lesson that lists are most helpful for storing multiple classes of data. In this case, since every element of the list returned by lapply() is a character vector of length one (i.e. "integer" and "vector"), cls_list can be simplified to a character vector. To do this manually, type as.character(cls_list).
+
+```{r}
+as.character(cls_list)
+```
+
+- sapply takes a list and applies a function to each element of the list just as lapply does. The "s" in sapply stands for simple cause sapply tries to simplify the output whereeover posisble.
+```{r}
+cls_vect <- sapply(flags, class)
+class(cls_vect)
+print(cls_vect)
+```
+
+- In general, if the result is a list where every element is of length one, then sapply() returns a vector. If the result is a list where every element is a vector of the same length (> 1), sapply() returns a matrix. If sapply() can't figure things out, then it just returns a list, no different from what lapply() would give you.
+
+Columns 11 through 17 of our dataset are indicator
+variables, each representing a different color. The
+value of the indicator variable is 1 if the color is
+present in a country's flag and 0 otherwise.
+
+Therefore, if we want to know the total number of
+countries (in our dataset) with, for example, the color
+orange on their flag, we can just add up all of the 1s
+and 0s in the 'orange' column. Try sum(flags$orange) to
+see this.
+
+```{r}
+sum(flags$orange)
+```
+
+Now we want to repeat this operation for each of the
+colors recorded in the dataset.
+
+First, use flag_colors <- flags[, 11:17] to extract the
+columns containing the color data and store them in a
+new data frame called flag_colors. (Note the comma
+before 11:17. This subsetting command tells R that we
+want all rows, but only columns 11 through 17.)
+
+```{r}
+flag_colors <- flags[ , 11:17]
+```
+
+Use the head() function to look at the first 6 lines of
+flag_colors.
+
+```{r}
+head(flag_colors)
+```
+
+To get a list containing the sum of each column of
+flag_colors, call the lapply() function with two
+arguments. The first argument is the object over which
+we are looping (i.e. flag_colors) and the second
+argument is the name of the function we wish to apply to
+each column (i.e. sum). Remember that the second
+argument is just the name of the function with no
+parentheses, etc.
+
+```{r}
+lapply(flag_colors, sum)
+```
+
+This tells us that of the 194 flags in our dataset, 153
+contain the color red, 91 contain green, 99 contain
+blue, and so on.
+
+The result is a list, since lapply() always returns a
+list. Each element of this list is of length one, so the
+result can be simplified to a vector by calling sapply()
+instead of lapply(). Try it now.
+
+```{r}
+sapply(flag_colors, sum)
+```
+
+Perhaps it's more informative to find the proportion of
+flags (out of 194) containing each color. Since each
+column is just a bunch of 1s and 0s, the arithmetic mean
+of each column will give us the proportion of 1s. (If
+it's not clear why, think of a simpler situation where
+you have three 1s and two 0s -- (1 + 1 + 1 + 0 + 0)/5 =
+3/5 = 0.6).
+
+Use sapply() to apply the mean() function to each column
+of flag_colors. Remember that the second argument to
+sapply() should just specify the name of the function
+(i.e. mean) that you want to apply.
+
+```{r}
+sapply(flag_colors, mean)
+```
+
+In the examples we've looked at so far, sapply() has
+been able to simplify the result to vector. That's
+because each element of the list returned by lapply()
+was a vector of length one. Recall that sapply() instead
+returns a matrix when each element of the list returned
+by lapply() is a vector of the same length (> 1).
+
+To illustrate this, let's extract columns 19 through 23
+from the flags dataset and store the result in a new
+data frame called flag_shapes. flag_shapes <- flags[,
+19:23] will do it.
+
+```{r}
+flag_shapes <- flags[, 19:23]
+```
+
+Each of these columns (i.e. variables) represents the
+number of times a particular shape or design appears on
+a country's flag. We are interested in the minimum and
+maximum number of times each shape or design appears.
+
+The range() function returns the minimum and maximum of
+its first argument, which should be a numeric vector.
+Use lapply() to apply the range function to each column
+of flag_shapes. Don't worry about storing the result in
+a new variable. By now, we know that lapply() always
+returns a list.
+
+```{r}
+lapply(flag_shapes, range)
+```
+
+Do the same operation, but using sapply() and store the
+result in a variable called shape_mat.
+
+```{r}
+shape_mat <- sapply(flag_shapes, range)
+```
+
+View the contents of shape_mat.
+```{r}
+shape_mat
+```
+
+Each column of shape_mat gives the minimum (row 1) and
+maximum (row 2) number of times its respective shape
+appears in different flags.
+
+Use the class() function to confirm that shape_mat is a
+matrix.
+
+```{r}
+class(shape_mat)
+```
+
+As we've seen, sapply() always attempts to simplify the
+result given by lapply(). It has been successful in
+doing so for each of the examples we've looked at so
+far. Let's look at an example where sapply() can't
+figure out how to simplify the result and thus returns a
+list, no different from lapply().
+
+When given a vector, the unique() function returns a
+vector with all duplicate elements removed. In other
+words, unique() returns a vector of only the 'unique'
+elements. To see how it works, try unique(c(3, 4, 5, 5,
+5, 6, 6)).
+
+```{r}
+unique(c(3, 4, 5, 5, 5, 6, 6))
+```
+
+We want to know the unique values for each variable in
+the flags dataset. To accomplish this, use lapply() to
+apply the unique() function to each column in the flags
+dataset, storing the result in a variable called
+unique_vals.
+
+```{r}
+unique_vals <- lapply(flags, unique)
+```
+
+Print the value of unique_vals to the console.
+
+```{r}
+unique_vals
+```
+
+Since unique_vals is a list, you can use what you've
+learned to determine the length of each element of
+unique_vals (i.e. the number of unique values for each
+variable). Simplify the result, if possible. Hint: Apply
+the length() function to each element of unique_vals.
+
+```{r}
+sapply(unique_vals, length)
+```
+
+The fact that the elements of the unique_vals list are
+all vectors of *different* length poses a problem for
+sapply(), since there's no obvious way of simplifying
+the result.
+
+Use sapply() to apply the unique() function to each
+column of the flags dataset to see that you get the same
+unsimplified list that you got from lapply().
+
+```{r}
+sapply(flags, unique)
+```
+
+Occasionally, you may need to apply a function that is
+not yet defined, thus requiring you to write your own.
+Writing functions in R is beyond the scope of this
+lesson, but let's look at a quick example of how you
+might do so in the context of loop functions.
+
+Pretend you are interested in only the second item from
+each element of the unique_vals list that you just
+created. Since each element of the unique_vals list is a
+vector and we're not aware of any built-in function in R
+that returns the second element of a vector, we will
+construct our own function.
+
+lapply(unique_vals, function(elem) elem[2]) will return
+a list containing the second item from each element of
+the unique_vals list. Note that our function takes one
+argument, elem, which is just a 'dummy variable' that
+takes on the value of each element of unique_vals, in
+turn.
+
+```{r}
+lapply(unique_vals, function(elem) { elem[2] })
+```
+
+The only difference between previous examples and this
+one is that we are defining and using our own function
+right in the call to lapply(). Our function has no name
+and disappears as soon as lapply() is done using it.
+So-called 'anonymous functions' can be very useful when
+one of R's built-in functions isn't an option.
+
+In this lesson, you learned how to use the powerful
+lapply() and sapply() functions to apply an operation
+over the elements of a list. In the next lesson, we'll
+take a look at some close relatives of lapply() and
+sapply().
+
+
+### swirl - 1 R Programming - 11 vapply and tapply
+In the last lesson, you learned about the two most
+fundamental members of R's *apply family of functions:
+lapply() and sapply(). Both take a list as input, apply
+a function to each element of the list, then combine and
+return the result. lapply() always returns a list,
+whereas sapply() attempts to simplify the result.
+
+In this lesson, you'll learn how to use vapply() and
+tapply(), each of which serves a very specific purpose
+within the Split-Apply-Combine methodology. For
+consistency, we'll use the same dataset we used in the
+'lapply and sapply' lesson.
+
+The Flags dataset from the UCI Machine Learning
+Repository contains details of various nations and their
+flags. More information may be found here:
+http://archive.ics.uci.edu/ml/datasets/Flags
+
+I've stored the data in a variable called flags. If it's
+been a while since you completed the 'lapply and sapply'
+lesson, you may want to reacquaint yourself with the
+data by using functions like dim(), head(), str(), and
+summary() when you return to the prompt (>). You can
+also type viewinfo() at the prompt to bring up some
+documentation for the dataset. Let's get started!
+
+As you saw in the last lesson, the unique() function
+returns a vector of the unique values contained in the
+object passed to it. Therefore, sapply(flags, unique)
+returns a list containing one vector of unique values
+for each column of the flags dataset. Try it again now.
+
+```{r}
+sapply(flags, unique)
+```
+
+What if you had forgotten how unique() works and
+mistakenly thought it returns the *number* of unique
+values contained in the object passed to it? Then you
+might have incorrectly expected sapply(flags, unique) to
+return a numeric vector, since each element of the list
+returned would contain a single number and sapply()
+could then simplify the result to a vector.
+
+When working interactively (at the prompt), this is not
+much of a problem, since you see the result immediately
+and will quickly recognize your mistake. However, when
+working non-interactively (e.g. writing your own
+functions), a misunderstanding may go undetected and
+cause incorrect results later on. Therefore, you may
+wish to be more careful and that's where vapply() is
+useful.
+
+Whereas sapply() tries to 'guess' the correct format of
+the result, vapply() allows you to specify it
+explicitly. If the result doesn't match the format you
+specify, vapply() will throw an error, causing the
+operation to stop. This can prevent significant problems
+in your code that might be caused by getting unexpected
+return values from sapply().
+
+Try vapply(flags, unique, numeric(1)), which says that
+you expect each element of the result to be a numeric
+vector of length 1. Since this is NOT actually the case,
+YOU WILL GET AN ERROR. Once you get the error, type ok()
+to continue to the next question.
+
+```{r}
+#vapply(flags, unique, numeric(1)) # Error
+```
+
+Recall from the previous lesson that sapply(flags,
+class) will return a character vector containing the
+class of each column in the dataset. Try that again now
+to see the result.
+
+```{r}
+sapply(flags, class)
+```
+
+If we wish to be explicit about the format of the result
+we expect, we can use vapply(flags, class,
+character(1)). The 'character(1)' argument tells R that
+we expect the class function to return a character
+vector of length 1 when applied to EACH column of the
+flags dataset. Try it now.
+```{r}
+vapply(flags, class, character(1))
+```
+
+Note that since our expectation was correct (i.e.
+character(1)), the vapply() result is identical to the
+sapply() result -- a character vector of column classes.
+
+You might think of vapply() as being 'safer' than
+sapply(), since it requires you to specify the format of
+the output in advance, instead of just allowing R to
+'guess' what you wanted. In addition, vapply() may
+perform faster than sapply() for large datasets.
+However, when doing data analysis interactively (at the
+prompt), sapply() saves you some typing and will often
+be good enough.
+
+As a data analyst, you'll often wish to split your data
+up into groups based on the value of some variable, then
+apply a function to the members of each group. The next
+function we'll look at, tapply(), does exactly that.
+
+Use ?tapply to pull up the documentation.
+
+```{r}
+?tapply
+```
+
+The 'landmass' variable in our dataset takes on integer
+values between 1 and 6, each of which represents a
+different part of the world. Use table(flags$landmass)
+to see how many flags/countries fall into each group.
+
+```{r}
+table(flags$landmass)
+```
+
+The 'animate' variable in our dataset takes the value 1
+if a country's flag contains an animate image (e.g. an
+eagle, a tree, a human hand) and 0 otherwise. Use
+table(flags$animate) to see how many flags contain an
+animate image.
+
+```{r}
+table(flags$animate)
+```
+
+This tells us that 39 flags contain an animate object
+(animate = 1) and 155 do not (animate = 0).
+
+If you take the arithmetic mean of a bunch of 0s and 1s,
+you get the proportion of 1s. Use tapply(flags$animate,
+flags$landmass, mean) to apply the mean function to the
+'animate' variable separately for each of the six
+landmass groups, thus giving us the proportion of flags
+containing an animate image WITHIN each landmass group.
+
+```{r}
+tapply(flags$animate, flags$landmass, mean)
+```
+
+The first landmass group (landmass = 1) corresponds to
+North America and contains the highest proportion of
+flags with an animate image (0.4194).
+
+
+Similarly, we can look at a summary of population values
+(in round millions) for countries with and without the
+color red on their flag with tapply(flags$population,
+flags$red, summary).
+
+```{r}
+tapply(flags$population, flags$red, summary)
+```
+
+What is the median population (in millions) for
+countries *without* the color red on their flag?
+
+1: 22.1
+2: 4.0
+3: 3.0
+4: 27.6
+5: 0.0
+6: 9.0
+
+Auswahl: 3
+
+Lastly, use the same approach to look at a summary of
+population values for each of the six landmasses.
+
+```{r}
+tapply(flags$population, flags$landmass, summary)
+```
+
+What is the maximum population (in millions) for the
+fourth landmass group (Africa)?
+
+1: 157.00
+2: 119.0
+3: 56.00
+4: 5.00
+5: 1010.0
+
+Auswahl: 3
+
+In this lesson, you learned how to use vapply() as a
+safer alternative to sapply(), which is most helpful
+when writing your own functions. You also learned how to
+use tapply() to split your data into groups based on the
+value of some variable, then apply a function to each
+group. These functions will come in handy on your quest
+to become a better data analyst.
+
+
+## Week 3 - Quiz
+- To load an example dataset, do the following:
+```{r}
+library(datasets)
+data(iris)
+?iris
+```
+
+## Weekl 3 - Programming Assignment 2
+
+### Instructions
+second programming assignment will require you to write an R function is able to cache potentially time-consuming computations. For example, taking the mean of a numeric vector is typically a fast operation. However, for a very long vector, it may take too long to compute the mean, especially if it has to be computed repeatedly (e.g. in a loop). If the contents of a vector are not changing, it may make sense to cache the value of the mean so that when we need it again, it can be looked up in the cache rather than recomputed. In this Programming Assignment will take advantage of the scoping rules of the R language and how they can be manipulated to preserve state inside of an R object.
+Review criterialess 
+This assignment will be graded via peer assessment. During the evaluation phase, you must evaluate and grade the submissions of at least 4 of your classmates. If you do not complete at least 4 evaluations, your own assignment grade will be reduced by 20%.
+Example: Caching the Mean of a Vectorless 
+In this example we introduce the <<- operator which can be used to assign a value to an object in an environment that is different from the current environment. Below are two functions that are used to create a special object that stores a numeric vector and cache's its mean.
+
+The first function, makeVector creates a special "vector", which is really a list containing a function to
+
+set the value of the vector
+get the value of the vector
+set the value of the mean
+get the value of the mean
+
+```{r}
+makeVector <- function(x = numeric()) {
+        m <- NULL
+        set <- function(y) {
+                x <<- y
+                m <<- NULL
+        }
+        get <- function() x
+        setmean <- function(mean) m <<- mean
+        getmean <- function() m
+        list(set = set, get = get,
+             setmean = setmean,
+             getmean = getmean)
+}
+```
+
+The following function calculates the mean of the special "vector" created with the above function. However, it first checks to see if the mean has already been calculated. If so, it gets the mean from the cache and skips the computation. Otherwise, it calculates the mean of the data and sets the value of the mean in the cache via the setmean function.
+
+
+```{r}
+cachemean <- function(x, ...) {
+        m <- x$getmean()
+        if(!is.null(m)) {
+                message("getting cached data")
+                return(m)
+        }
+        data <- x$get()
+        m <- mean(data, ...)
+        x$setmean(m)
+        m
+}
+```
+
+### Assignment: Caching the Inverse of a Matrixless
+
+Matrix inversion is usually a costly computation and there may be some benefit to caching the inverse of a matrix rather than compute it repeatedly (there are also alternatives to matrix inversion that we will not discuss here). Your assignment is to write a pair of functions that cache the inverse of a matrix.
+
+#### Write the following functions:
+
+makeCacheMatrix: This function creates a special "matrix" object that can cache its inverse.
+cacheSolve: This function computes the inverse of the special "matrix" returned by makeCacheMatrix above. If the inverse has already been calculated (and the matrix has not changed), then the cachesolve should retrieve the inverse from the cache.
+Computing the inverse of a square matrix can be done with the solve function in R. For example, if X is a square invertible matrix, then solve(X) returns its inverse.
+
+For this assignment, assume that the matrix supplied is always invertible.
+
+#### In order to complete this assignment, you must do the following:
+
+Fork the GitHub repository containing the stub R files at https://github.com/rdpeng/ProgrammingAssignment2 to create a copy under your own account.
+Clone your forked GitHub repository to your computer so that you can edit the files locally on your own machine.
+Edit the R file contained in the git repository and place your solution in that file (please do not rename the file).
+Commit your completed R file into YOUR git repository and push your git branch to the GitHub repository under your account.
+Submit to Coursera the URL to your GitHub repository that contains the completed R code for the assignment.
+In addition to submitting the URL for your GitHub repository, you will need to submit the 40 character SHA-1 hash (as string of numbers from 0-9 and letters from a-f) that identifies the repository commit that contains the version of the files you want to submit. You can do this in GitHub by doing the following
+
+Going to your GitHub repository web page for this assignment
+Click on the "?? commits" link where ?? is the number of commits you have in the repository. For example, if you made a total of 10 commits to this repository, the link should say "10 commits".
+You will see a list of commits that you have made to this repository. The most recent commit is at the very top. If this represents the version of the files you want to submit, then just click the "copy to clipboard" button on the right hand side that should appear when you hover over the SHA-1 hash. Paste this SHA-1 hash into the course web site when you submit your assignment. If you don't want to use the most recent commit, then go down and find the commit you want and copy the SHA-1 hash.
+A valid submission will look something like (this is just an example!)
+
+1 https://github.com/rdpeng/ProgrammingAssignment2
+
+#### Grading
+
+This assignment will be graded via peer assessment. During the evaluation phase, you must evaluate and grade the submissions of at least 4 of your classmates. If you do not complete at least 4 evaluations, your own assignment grade will be reduced by 20%.
+
+#### Submission
+
+```{r}
+# ---------------------------------------------------------
+# Project     : Coursera Data Science: R Programming
+# Sub Project : Week 3 - Programming Assignment 2
+# Task        : Lexical Scoping
+# Author      : Georg Maubach
+# Created     : 2016-12-10
+# Updated     : 2016-12-10
+# ---------------------------------------------------------
+# Motto: Explicit is good!
+# ---------------------------------------------------------
+
+# [ Functions ] -------------------------------------------
+
+makeCacheMatrix <- function(m = matrix())
+#----------------------------------------------------------
+#'
+#' @title makeCacheMatrix
+#'
+#' @description
+#' \code{function_name} This function creates a special 
+#' "matrix" object that can cache its inverse.
+#'
+#' @usage
+#'   my_matrix <- makeCacheMatrix(m = matrix())
+#'
+#' @details
+#'   Creates a list of getting and setting functions for
+#'   the matrix as well as the setting and getting
+#'   functions for the inverse of the matrix.
+#'   @section Caching
+#'   Caching is done with objects with the function.
+#'
+#' @param m (object of class matrix)
+#'   m is a square invertible matrix.
+#'
+#' @return Returns a list with getter and setter functions.
+#'
+#' @author Georg Maubach
+#' 
+#----------------------------------------------------------
+{
+  matrix_inverse <- NULL
+  
+  set_matrix <- function(y) 
+  {
+    matrix_data    <<- y
+    matrix_inverse <<- NULL
+  }
+  
+  get_matrix <- function()
+  {
+    return(m)
+  }
+  
+  set_inverse <- function(inversed_matrix)
+  {
+    matrix_inverse <<- inversed_matrix
+  }
+  
+  get_inverse <- function()
+  {
+    return(matrix_inverse)
+  }
+  
+  return(
+    list(
+      set_matrix = set_matrix,
+      get_matrix = get_matrix,
+      set_inverse = set_inverse,
+      get_inverse = get_inverse)
+  )
+}
+
+cacheSolve <- function(FUN, ...)
+#----------------------------------------------------------
+#'
+#' @title cacheSolve
+#'
+#' @description
+#' \code{function_name} This function returns an inverted
+#' matrix either from cache or if it is not present there
+#' fresh calculated.
+#'
+#' @usage
+#'  my_cache_solve <- cacheSolve(FUN = my_cache_matrix)
+#'
+#' @details
+#'    Returns an inverted matrix either from cache or if
+#'    it is not present there fresh calculated.
+#'    Inverting is done using solve().
+#'
+#' @param m (matrix list)
+#'   FUN is a list containing getter and setter functions
+#'   for a matrix cache function.
+#'
+#' @return Returns the inverse of a matrix.
+#'
+#' @author Georg Maubach
+#' 
+#----------------------------------------------------------
+{
+  inverse <- FUN$get_inverse()
+  
+  if(!is.null(inverse))
+  {
+    message("getting cached inverse")
+    return(inverse)
+  } else 
+  {
+    message("calculating inverse from data and caching it")
+    data <- FUN$get_matrix()
+    i <- solve(data, ...)
+    FUN$set_inverse(i)
+    return(i)
+  }
+}
+
+# [ Tests ] -----------------------------------------------
+my_matrix <- matrix(data = c(1, 2, 3, 4),
+                    nrow = 2,
+                    ncol = 2)
+
+my_cached_matrix <- makeCacheMatrix(m = my_matrix)
+
+for (i in c(1, 2, 3))
+{
+  my_inverse <- cacheSolve(FUN = my_cached_matrix)
+}
+
+# EOF .
+
+```
+
+#### From the Week 3 forum (by Maarten Klein)
+Hi Leonard, I was wondering why the use two functions (makeVector and cachemean) and not one function.
+
+```{r}
+cacheVector <- function(x = numeric()) {
+    m <- NULL
+    set <- function(y) {
+        x <<- y
+        m <<- NULL
+    }
+    get <- function() x
+    mean <- function(...) {
+        if (!is.null(m)) {
+            message("getting cached data")
+            return(m)
+        }
+        
+        m <<- base::mean(x, ...)
+        m
+    }
+    list(set = set, get = get, mean = mean)   
+}
+
+m <- cacheVector(1:100)
+
+m$mean()
+```
+
+By this you dont have the problem that the cachemean can be called with a vector instead of a makeVector object and that the getmean() and setmean() functions which now are exposed to every one (instead only to cachemean) are not necessary. Using het getmean() function directly can have unexpected result.
+
+# Week 4: Simulation & Profiling
+
+## Lesson 1: str()
+- str() compactly displays the internal structure of an R object.
+- It can be used as a diagnosis functions for objects.
+- Espacially usefull to display (nested) lists.
+- Generally speaking str() answers the questions: What's in an object?
+
+```{r}
+str(str)
+
+str(ls)
+x <- rnorm(100, 2, 4)
+summary(x)
+str(x)
+
+f <- gl(40, 10)  # generate factor levels
+str(f)
+summary(f)
+
+library(datasets)
+head(airquality)
+str(airquality)
+
+m <- matrix(rnorm(100, 10,10))
+str(m)
+m[, 1]
+
+s <- split(airquality, airquality$Month)
+str(s)
+
+f <- function()
+{
+  return(5)
+}
+str(f)
+```
+- str() can particularly used for
+      - having a quick look at the data
+      - see if there are any problems
+      - spot missing values
+      - getting a sense of what to do next
+      
+** Hint: ** Use str() anytime you want to know what's there in an R object.
+
+## Lesson 2: Simulation
+### Generating Random Numbers
+- These functions are used to generate data for simulation.
+- rnorm: generate random Normal variates with a given mean/sd
+- dnorm: evaluate the Normal probability density (with a given mean/sd) at a point (or a vector)
+- pnorm: evaluate the cumulative distribution function for a Normal distribution
+rpois: generate random Poisson variates with given rate
+
+#### General distributions
+R supports all sort of distributions. The most important are:
+
+- norm: normal distribution
+- pois: poisson distribution
+
+#### Distribution functions
+For each distribution there are 4 functions beginning with "d", "r", "p", "q":
+
+1. d: density of a distribution given a mean and a standard deviation
+2. r: random number generation
+3. p: cumulative distribution
+4. q: quantile function
+
+#### Examples
+Normal distribution: dnorm, rnorm, pnorm, qnorm
+Poisson distribution: dpois, rpois, ppois, qpois
+Gamma: dgamma, rgamma, pgamma, qgamma
+
+The normal distribution requires using the below given functions. All these functions have standard values for their arguments also stated below.
+
+dnorm(x, mean = 0, sd = 1, log = FALSE)
+pnorm(q, mean = 0, sd = 1, lower.tail = TRUE, log.p = FALSE)
+qnorm(p, mean = 0, sd = 1, lower.tail = TRUE, log.p = FALSE)
+rnorm(n, mean = 0, sd = 1)
+
+If phi is the cumulative distribution function for a standard Normal distribution, the pnorm(q) = phi(q) and qnorm(p) = phi hoch -1 (p).
+
+```{r}
+x <- rnorm(10)  # mean = 0, sd = 1
+x
+
+x <- rnorm(10, 20, 2)  # mean = 20, sd = 2
+x
+summary(x)
+```
+
+#### Reproducibility when using random numbers
+- The numbers generated are not "random" then but look like random.
+- If you need to reproduce your results you have to use the random number generator with set.seed().
+- set.seed() ensures that the same "random" numbers are generated during each run. This generates the same numbers twice or more often.
+- This gives you the opportunity to work on problems you encounter.
+
+```{r}
+set.seed(1)
+rnorm(5)
+rnorm(5)
+set.seed(1)
+rnorm(5)
+```
+
+** Please note **
+Always set the random number generator when conducting a simulation.
+
+```{r}
+rpois(10, 1)
+rpois(10, 2)
+rpois(10, 20)
+```
+
+- What is the probability the the poisson variable is less than or equal to 2.
+
+```{r}
+# Cumulative distribution
+ppois(2, 2)  # Pr(x <= 2)
+ppois(4, 2)  # Pr(x <= 4)
+ppois(6, 2)  # Pr(x <= 6)
+```
+
+- The cumulative distribution allows you to, to evaluate these probabilities.
+
+## Lesson 3: Simulation - Simulating a Linear Model
+- y = beta-0 + beta-1 x + epsilon
+- where epsilon ~ N(0,2**2), assume x ~ N(0,1**2), beta-0 = 0.5, beta-1 = 2.
+
+### Generating numbers from a linear model #1
+```{r}
+set.seed(20)
+x <- rnorm(100)
+epsilon <- rnorm(100, 0, 2)
+y <- 0.5 + 2 * x + epsilon
+summary(y)
+plot(x, y)  # x and y have a clear relationship
+```
+
+### Generating numbers form a linear model #2
+```{r}
+x <- rbinom(100, 1, 0.5)
+epsilon <- rnorm(100, 0, 2) 
+y <- 0.5 + 2 * x + epsilon
+summary(y)
+plot(x, y)  # x is binary, y is continuous
+```
+
+### Generating Random Numbers from a Generalized Linear Model
+- Y ~ Poisson(p)
+log mu = beta-0 + beta-1 x
+and beta-0 = 0.5 and beta-1 = 0.3
+
+- We need to use the rpois() function for this cause the error distribution is not going to be normal.
+
+```{r}
+set.seed(1)
+x <- rnorm(100)
+log.mu <- 0.5 + 0.3 * x
+y <- rpois(100, exp(log.mu))  # 100 random variable exponential of the log mean
+summary(y)
+plot(x, y)
+```
+
+## Lesson 4: Simulation - Random Sampling
+### sample()
+- The sample function draws randomly from a specified set of objects allowing to sample from arbitrary distributions.
+
+```{r}
+set.seed(1)
+sample(1:10, 4)
+sample(1:10, 4)
+sample(letters, 5)
+sample(1:10)
+sample(1:10)
+sample(1:10, replace = TRUE)
+```
+
+### Summary
+- Drawing sample from specific probability distributions can be done with r* functions.
+- Standard distributions are build in R: Normal, Poisson, Binomial, Exponential, Gamma, etc.
+-  The sample() function can draw ramdon samples from arbritrary vectors.
+- Setting the random number generator "seed" is necessary for reproducibility.
+
+## Lesson 5: R Profiler - Part 1
+### Why is my code so slow?
+- The R profiler gives information on the performance of R programs.
+- Profiling is a systematic way to examine how much time is spend in different parts of the program.
+- It is useful to optimize the code.
+- Often code runs fine one. But if you put it in a loop for 1.000 iterations, is it still fast enough?
+
+** Please note ** Profiling is better than guessing.
+
+### On Optimizing code
+- Don't think about optimzing at first. Get the code up and running and then think about optimzing it if necessary in the parts taking a long time to execute.
+- Performance can not be optimized without profiling cause measuring is better than guessing.
+
+### General principles of optimization
+- Design your code first in a way that it is understandable, then optimize.
+- Work like a scientist when optimizing code: collect some data by profiling and then act on it.
+
+### Profiling tools
+#### system.time()
+- system.time() takes an arbitrary R expression as input (possibly wrapped in curse braces) and return the amount taken to evaluate the expression.
+- The time is computed in seconds.
+- The return value is an object of class "proc_time":
+
+1. user time: time charged to the CPU (system used time)
+2. elapsed time: time to run from start to end (user experienced time)
+
+
+- Elapsed time > user time: program is waiting for external processes to complete.
+- Elapsed time < user time: due to parallel processing using multi-core processor, multi-threaded BLAS (basic linear algebra standard) libraries (veclib/Accelarate for MAC, ATLAS for AMD, ACML, MKL for Intel) or parallel process via the parallel package able to use multiple core (not multile computers).
+
+```{r}
+# Elapsed time > user time
+system.time(readLines("http://www.jhsph.edu"))
+
+# Elapsed time < user time
+hilbert <- function(n)
+{
+  i <- 1:n
+  1 / outer(i -1, i, "+")
+}
+
+x <- hilbert(1000)
+system.time(svd(x))
+```
+#### Timing longer expressions
+```{r}
+system.time(
+  {
+    n <- 1000
+    r <- numeric(n)
+    
+    for (i in 1:n)
+    {
+      x <- rnorm(n)
+      r[i] <- mean(x)
+    }
+  }
+)
+```
+
+#### Drawbacks of system.time()
+- system.time() allows you to test certain functions or code blocks to see if they are taking excessive amounts of time.
+- You need to know already where the problem is and call system.time() on the code.
+
+## Lesson 6: R Profiler - Part 2
+### Using Rprof()
+- The R profiler is a function in R called Rprof().
+- The function summaryRprof() summarized the output of the profiler and makes it readable.
+
+** Note ** Your version of R must be compiled with profiler support. Normally R comes compiled with profiler support.
+
+** Note ** Do not use the functions system.time() and Rprof() together. Use one or the other.
+
+- Rprof() keeps track of the function call stack (default = 0.02 seconds) at regularly sampled intervalls and tabulates how much time is spend in each function.
+
+** Note ** The usage of the profiler is only useful if the evaluation time is larger than 1 second.
+
+```{r}
+# lm(y ~ x)
+sample.intervall = 10000
+```
+### Using summaryRprof()
+- summaryRprof() tabulates the R profiler output and calculates how much time is spend in each function.
+- There are two methods for normalizing the Rprof() output data:
+
+1. by.total: divides the time spend in each function by the total run time
+2. by. self: substracts the time spent in functions above in the call stack and then divides the time spend in each function by the total run time.
+
+```{r}
+# Example code is missing
+```
+
+### Sunmmary on Rprof()
+- Rprof() runs the profiler for performance analysis of your R code.
+- summaryRprof() summarizes Rprof() output.
+
+** Note ** In order to work efficiently with the profiler your code must reside in different functions the profiler can analyse. If all code sits in one function the profiler can not give information of where most of the time is spent.
+
+** Note ** C or Fortran code is not profiled. C or Fortran code is a black box to Rprof().
+
+## swirl for the week
+### swirl - 1 R Programming - 12 Looking at data
+#### Information about data
+- What is the format of the data?
+- What are the dimensions?
+- What are the variable names?
+- How are the variables stored (mode, class)?
+- Are there missing data?
+- Are there any flaws in the data?
+
+```{r}
+serial_number <- c(
+  "SerialNumber                              \r",
+  "32534230394a5330303837393333202020202020  \r", 
+  "32534230394a5a44303331363039202020202020  \r",
+  "20202020202020202020202037573736564d5853  \r", 
+  "\r")
+if (identical(
+  system(
+    command = "wmic DISKDRIVE get SerialNumber",
+    intern = TRUE),
+  serial_number))
+  {
+    plants <- read.csv2(
+      file = file.path(
+        "N:/2016/repos_2016/datasciencecoursera/Data",
+        "2016-12-15_swirl_12-Looking-at-data_plants.csv"))
+  } else {warning("Dataset 'plants' not found!")}
+```
+#### Data Exterior (shape and size)
+##### ls()
+- What objects do we have in the global environment?
+
+```{r}
+ls()
+```
+
+##### class()
+- What overall structure does the data have?
+
+```{r}
+class(plants)
+```
+##### dim(), nrow(), ncol()
+- What dimensions does the data have?
+
+```{r}
+dim(plants)
+```
+
+The first number you see (5166) is the number of rows (observations) and the second number (10) is the number of columns (variables).
+
+```{r}
+nrow(plants)  # number of rows
+ncol(plants)  # number of columns
+```
+
+##### object.size()
+- How much space does the dataset occupy in memory?
+
+```{r}
+object.size(plants)
+```
+#### Data Interior
+##### names()
+- What variables are in the dataset?
+
+```{r}
+names(plants)
+```
+
+##### head(), tail()
+- Variable names are not always there.
+- What do the observations look like?
+
+```{r}
+head(plants)  # first 6 rows
+head(plants, n = 10)  # first 10 rows
+
+tail(plants, n = 15)  # last 15 rows
+```
+
+##### summary()
+- How is each variable distributed?
+- How much of the dataset is missing?
+
+```{r}
+summary(plants)
+```
+
+summary() provides different output for each variable, depending on its class. For numeric data such as Precip_Min, summary() displays the minimum, 1st quartile, median, mean, 3rd quartile, and maximum. These values help us understand how the data are distributed.
+
+For categorical variables (called 'factor' variables in R), summary() displays the number of times each value (or 'level') occurs in the data. For example, each value of Scientific_Name only appears once, since it is unique to a specific plant. In contrast, the summary for Duration (also a factor variable) tells us that our dataset contains 3031 Perennial plants, 682 Annual plants, etc.
+
+You can see that R truncated the summary for Active_Growth_Period by including a catch-all category called 'Other'.
+
+##### table()
+- How many times does each value occur in the data?
+
+```{r}
+table(plants$Active_Growth_Period)
+```
+
+##### str()
+- What is the structure of the data?
+
+```{r}
+str(plants)
+```
+
+The beauty of str() is that it combines many of the features of the other functions you've already seen, all in a concise and readable format. At the very top, it tells us that the class of plants is 'data.frame' and that it has 5166 observations and 10 variables. It then gives us the name and class of each variable, as well as a preview of its contents.
+
+str() is actually a very general function that you can use on most objects in R. Any time you want to understand the structure of something (a dataset, function, etc.), str() is a good place to start.
+
+In this lesson, you learned how to get a feel for the structure and contents of a new dataset using a collection of simple and useful functions. Taking the time to do this upfront can save you time and frustration later on in your analysis.
+
+### swirl - 1 R Programming - 13 Simulation
+One of the great advantages of using a statistical programming language like R is its vast collection of tools for simulating random numbers.
+
+#### Random number generation
+##### sample()
+```{r}
+?sample
+```
+Let's simulate rolling four six-sided dice:
+```{r}
+sample(1:6, 4, replace = TRUE)
+```
+
+Now repeat the command to see how your result differs. (The probability of | rolling the exact same result is (1/6)^4 = 0.00077, which is pretty small!)
+```{r}
+sample(1:6, 4, replace = TRUE)
+```
+
+sample(1:6, 4, replace = TRUE) instructs R to randomly select four numbers | between 1 and 6, WITH replacement. Sampling with replacement simply means that each number is "replaced" after it is selected, so that the same number can show up more than once. This is what we want here, since what you roll on one die shouldn't affect what you roll on any of the others.
+
+Now sample 10 numbers between 1 and 20, WITHOUT replacement.
+```{r}
+sample(1:20, 10)
+```
+
+LETTERS is a predefined variable in R containing a vector of all 26 letters of the English alphabet. Take a look at it now.
+
+```{r}
+print(LETTERS)
+str(LETTERS)
+```
+
+The sample() function can also be used to permute, or rearrange, the elements of a vector. For example, try sample(LETTERS) to permute all 26 letters of the English alphabet.
+
+```{r}
+sample(LETTERS)
+```
+
+This is identical to taking a sample of size 26 from LETTERS, without replacement. When the 'size' argument to sample() is not specified, R takes a sample equal in size to the vector from which you are sampling.
+
+Now, suppose we want to simulate 100 flips of an unfair two-sided coin. This particular coin has a 0.3 probability of landing 'tails' and a 0.7 probability of landing 'heads'.
+Let the value 0 represent tails and the value 1 represent heads. Use sample() to draw a sample of size 100 from the vector c(0,1), with replacement. Since the coin is unfair, we must attach specific probabilities to the values 0 (tails) and 1 (heads) with a fourth argument, prob = c(0.3, 0.7). Assign the result to a new variable called flips.
+
+```{r}
+flips <- sample(
+  c(0,1), 
+  size = 100, 
+  prob = c(0.3, 0.7),
+  replace = TRUE)
+print(flips)
+sum(flips)
+```
+
+A coin flip is a binary outcome (0 or 1) and we are performing 100 independent trials (coin flips), so we can use rbinom() to simulate a binomial random variable. Pull up the documentation for rbinom() using ?rbinom.
+
+```{r}
+?rbinom
+```
+
+Each probability distribution in R has an r*** function (for "random"), a d*** function (for "density"), a p*** (for "probability"), and q*** (for "quantile"). We are most interested in the r*** functions in this lesson, but I encourage you to explore the others on your own.
+
+A binomial random variable represents the number of 'successes' (heads) in a given number of independent 'trials' (coin flips). Therefore, we can generate a
+| single random variable that represents the number of heads in 100 flips of our unfair coin using rbinom(1, size = 100, prob = 0.7). Note that you only specify the probability of 'success' (heads) and NOT the probability of 'failure' (tails).
+
+```{r}
+rbinom(1, size = 100, prob = 0.7)
+```
+
+
+Equivalently, if we want to see all of the 0s and 1s, we can request 100 observations, each of size 1, with success probability of 0.7. Give it a try, assigning the result to a new variable called flips2.
+
+```{r}
+flips2 <- rbinom(100, size = 1, prob = 0.7)
+sum(flips2)  # sum should be close to 70
+```
+
+Similar to rbinom(), we can use R to simulate random numbers from many other probability distributions. Pull up the documentation for rnorm() now.
+
+```{r}
+?rnorm
+```
+
+The standard normal distribution has mean 0 and standard deviation 1. As you can see under the 'Usage' section in the documentation, the default values for the 'mean' and 'sd' arguments to rnorm() are 0 and 1, respectively. Thus, rnorm(10) will generate 10 random numbers from a standard normal distribution. 
+
+```{r}
+?rnorm(10)
+```
+
+Now do the same, except with a mean of 100 and a standard deviation of 25.
+
+```{r}
+rnorm(n = 10, mean = 100, sd = 25)
+```
+
+Finally, what if we want to simulate 100 *groups* of random numbers, each containing 5 values generated from a Poisson distribution with mean 10? Let's start with one group of 5 numbers, then I'll show you how to repeat the operation 100 times in a convenient and compact way.
+
+Generate 5 random values from a Poisson distribution with mean 10. Check out the documentation for rpois() if you need help.
+
+```{r}
+?rpois
+rpois(5, 10)
+```
+
+Now use replicate(100, rpois(5, 10)) to perform this operation 100 times. Store the result in a new variable called my_pois.
+
+```{r}
+my_pois <- replicate(100, rpois(5, 10))
+```
+
+replicate() created a matrix, each column of which contains 5 random numbers generated from a Poisson distribution with mean 10. Now we can find the mean of
+| each column in my_pois using the colMeans() function. Store the result in a variable called cm. 
+
+```{r}
+cm <- colMeans(my_pois)
+```
+
+And let's take a look at the distribution of our column means by plotting a histogram with hist(cm).
+
+```{r}
+hist(cm)
+```
+
+All of the standard probability distributions are built into R, including exponential (rexp()), chi-squared (rchisq()), gamma (rgamma()), .... Well, you see the pattern.
+
+Simulation is practically a field of its own and we've only skimmed the surface of what's possible. I encourage you to explore these and other functions further on your own.
+
+### swirl - 1 R Programming - 14 Basic Graphics
+#### Scatterplots
+```{r}
+data(cars)
+?cars
+head(cars)
+```
+
+Before plotting, it is always a good idea to get a sense of the data. Key R commands for doing so include, dim(), names(), head(), tail() and summary().
+
+```{r}
+plot(cars)  # plot is short for scatterplot
+?plot
+plot(x = cars$speed, y = cars$dist)
+plot(x = cars$dist, y = cars$speed)
+```
+
+It probably makes more sense for speed to go on the x-axis since stopping  distance is a function of speed more than the other way around. 
+
+** Please note **
+Note that there are other ways to call the plot command, i.e., using the "formula" interface. For example, we get a similar plot to the above with
+ plot(dist ~ speed, cars). However, we will wait till later in the lesson before using the formula interface.
+
+```{r}
+plot(x = cars$speed, y = cars$dist, xlab = "Speed")  # x-axis label
+plot(x = cars$speed, y = cars$dist, ylab = "Stopping Distance")  # y-axis label
+plot(x = cars$speed, y = cars$dist, xlab = "Speed", ylab = "Stopping Distance")
+```
+
+The reason that plots(cars) worked at the beginning of the lesson was that R was smart enough to know that the first element (i.e., the first column) in cars should be assigned to the x argument and the second element to the y argument. To save on typing, the next set of answers will all be of the form, plot(cars, ...) with various arguments added.
+
+```{r}
+plot(cars, main = "My Plot")
+plot(cars, sub = "My Plot Subtitle")
+```
+
+The plot help page (?plot) only covers a small number of the many arguments that can be passed in to plot() and to other graphical functions. To begin to explore the many other options, look at ?par. Let's look at some of the more commonly used ones. Continue using plot(cars, ...) as the base answer to these questions.
+
+```{r}
+ plot(cars, col = 2)  # points in red
+plot(cars, xlim = c(10, 15))  # limiting x-axis
+```
+
+You can also change the shape of the symbols in the plot. The help page for points (?points) provides the details. 
+
+Plot cars using triangles.  (Use pch = 2 to achieve this effect.)
+
+```{r}
+plot(cars, pch = 2)
+```
+
+#### Boxplots
+```{r}
+data(mtcars)
+dim(mtcars)
+head(mtcars)
+```
+
+Anytime that you load up a new data frame, you should explore it before using it. In the middle of a swirl lesson, just type play(). This temporarily suspends the lesson (without losing the work you have already done) and allows you to issue commands like dim(mtcars) and head(mtcars). Once you are done examining the data, just type nxt() and the lesson will pick up where it left off.
+
+```{r}
+?boxplot
+```
+
+Instead of adding data columns directly as input arguments, as we did with
+plot(), it is often handy to pass in the entire data frame. This is what the "data" argument in boxplot() allows.
+
+boxplot(), like many R functions, also takes a "formula" argument, generally an expression with a tilde ("~") which indicates the relationship between the input variables. This allows you to enter something like mpg ~ cyl to plot the relationship between cyl (number of cylinders) on the x-axis and mpg (miles per gallon) on the y-axis.
+
+```{r}
+boxplot(formula = mpg ~ cyl, data = mtcars)
+```
+
+The plot shows that mpg is much lower for cars with more cylinders. Note that we can use the same set of arguments that we explored with plot() above to add axis labels, titles and so on.
+
+When looking at a single variable, histograms are a useful tool. hist() is the associated R function. Like plot(), hist() is best used by just passing in a single vector.
+
+```{r}
+hist(mtcars$mpg)
+```
+
+If you want to explore other elements of base graphics, then this web page
+ (http://www.ling.upenn.edu/~joseff/rstudy/week4.html) provides a useful overview.
